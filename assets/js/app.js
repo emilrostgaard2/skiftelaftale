@@ -119,7 +119,7 @@
     // fetch med timeout, så en kilde der hænger ikke blokerer fallback
     function hentJson(url) {
       var c = ('AbortController' in window) ? new AbortController() : null;
-      var t = setTimeout(function () { if (c) c.abort(); }, 8000);
+      var t = setTimeout(function () { if (c) c.abort(); }, 15000);
       return fetch(url, c ? { signal: c.signal } : {}).then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
     }
     // Primær kilde: Energi Data Service (Energinet). Priser i DKK/MWh ekskl. moms.
@@ -136,6 +136,21 @@
         return { kilde: 'Energi Data Service (Energinet)', raekker: rk };
       });
     }
+    // Reservekilde, hvis Energinet ikke svarer. Priser i DKK/kWh ekskl. moms.
+    function hentReserve(omraade) {
+      var d = new Date(), im = new Date(d.getTime() + 864e5);
+      var u = function (x) { return 'https://www.elprisenligenu.dk/api/v1/prices/' + x.getFullYear() + '/' + pad(x.getMonth() + 1) + '-' + pad(x.getDate()) + '_' + omraade + '.json'; };
+      var tilRk = function (j) { return j.map(function (x) { return { t: new Date(x.time_start), kr: x.DKK_per_kWh }; }); };
+      return hentJson(u(d)).then(function (j) {
+        var rk = tilRk(j); if (!rk.length) throw new Error('Tomt svar');
+        return hentJson(u(im)).then(function (j2) { return rk.concat(tilRk(j2)); }).catch(function () { return rk; });
+      }).then(function (rk) { return { kilde: 'Elprisen lige nu.dk (reservekilde)', raekker: rk }; });
+    }
+    // Lokal kopi af seneste svar, så siden aldrig står tom, hvis begge kilder driller
+    function gem(o, res) { try { localStorage.setItem('elpris-' + o, JSON.stringify({ d: dagStr(new Date()), k: res.kilde, r: res.raekker.map(function (x) { return [x.t.getTime(), x.kr]; }) })); } catch (e) {} }
+    function laes(o) { try { var c = JSON.parse(localStorage.getItem('elpris-' + o)); if (c && c.d === dagStr(new Date())) return { kilde: c.k + ' (gemt kopi)', raekker: c.r.map(function (x) { return { t: new Date(x[0]), kr: x[1] }; }) }; } catch (e) {} return null; }
+    var vent = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+
     // Saml kvarterspriser til timegennemsnit, og læg moms på
     function tilTimer(raekker) {
       var m = {};
@@ -217,16 +232,24 @@
       try { document.dispatchEvent(new CustomEvent('elpris', { detail: { nu: nuT.ore, min: min, max: max, snit: snit } })); } catch (e) {}
       
       saet('#hentet', 'kl. ' + pad(nu.getHours()) + '.' + pad(nu.getMinutes()));
+      saet('#kilde', res.kilde);
       live.classList.add('klar');
     }
+    var sidsteFejl = '';
     function fejl() {
       var graf = $('#graf');
       if (graf && graf.hasAttribute('hidden')) { var sek = live.closest('section'); if (sek) sek.hidden = true; return; }
-      if (graf) graf.innerHTML = '<p class="graf-fejl">Vi kan ikke hente dagens priser lige nu. Prøv at genindlæse siden om lidt – eller se priserne direkte hos <a href="https://www.energidataservice.dk/" rel="noopener">Energi Data Service</a>.</p>';
+      if (graf) graf.innerHTML = '<p class="graf-fejl">Vi kan ikke hente dagens priser lige nu. Prøv at genindlæse siden om lidt – eller se priserne direkte hos <a href="https://www.energidataservice.dk/" rel="noopener">Energi Data Service</a>.<br><small style="opacity:.7">Teknisk: ' + sidsteFejl + '</small></p>';
     }
     function hent() {
       $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.o === omr ? 'true' : 'false'); });
-      hentEnerginet(omr).then(vis).catch(fejl);
+      var o = omr, kopi = laes(o);
+      if (kopi) { try { vis(kopi); } catch (e) {} }
+      hentEnerginet(o)
+        .catch(function (e1) { sidsteFejl = 'Energinet: ' + (e1 && e1.message || e1); return vent(1500).then(function () { return hentEnerginet(o); }); })
+        .catch(function (e2) { sidsteFejl = 'Energinet: ' + (e2 && e2.message || e2); return hentReserve(o); })
+        .then(function (res) { gem(o, res); vis(res); })
+        .catch(function (e3) { sidsteFejl += ' | Reserve: ' + (e3 && e3.message || e3); if (!kopi) fejl(); });
     }
     $$('.dagvalg button').forEach(function (b) { b.addEventListener('click', function () { if (b.disabled) return; visDag = b.dataset.d; if (sidste) vis(sidste); }); });
     $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.addEventListener('click', function () {
