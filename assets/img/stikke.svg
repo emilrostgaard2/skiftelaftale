@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="stikke " viewBox="0 0 420 380" aria-hidden="true">
+<title>Stikke – SkiftElaftales maskot</title>
+<ellipse cx="200" cy="362" rx="120" ry="12" fill="#0E1B3D" opacity=".12"/>
+<path d="M150 322v26M250 322v26" stroke="#0E1B3D" stroke-width="12" stroke-linecap="round"/>
+<path d="M132 352h34M234 352h34" stroke="#0E1B3D" stroke-width="12" stroke-linecap="round"/>
+<g class="arm"><path d="M318 250c30-8 44-30 50-58" fill="none" stroke="#0E1B3D" stroke-width="12" stroke-linecap="round"/><circle cx="370" cy="186" r="15" fill="#FFC93C" stroke="#0E1B3D" stroke-width="6"/></g>
+<path d="M82 250c-30-6-42-24-46-50" fill="none" stroke="#0E1B3D" stroke-width="12" stroke-linecap="round"/><circle cx="34" cy="194" r="15" fill="#FFC93C" stroke="#0E1B3D" stroke-width="6"/>
+<rect x="70" y="40" width="260" height="290" rx="46" fill="#fff" stroke="#0E1B3D" stroke-width="8"/>
+<rect x="86" y="56" width="228" height="258" rx="34" fill="#EEF2FB"/>
+<circle class="glod" cx="200" cy="236" r="78" fill="#FFC93C" opacity=".55"/>
+<g><rect x="156" y="70" width="88" height="62" rx="14" fill="#0E1B3D"/><g class="vippe"><rect x="164" y="77" width="72" height="24" rx="8" fill="#FFC93C"/><rect x="164" y="102" width="72" height="23" rx="8" fill="#33406A"/></g></g>
+<circle cx="200" cy="236" r="70" fill="#fff" stroke="#0E1B3D" stroke-width="7"/>
+<ellipse class="oje v" cx="172" cy="220" rx="11" ry="14" fill="#0E1B3D"/><ellipse class="oje h" cx="228" cy="220" rx="11" ry="14" fill="#0E1B3D"/>
+<circle cx="176" cy="215" r="3.5" fill="#fff"/><circle cx="232" cy="215" r="3.5" fill="#fff"/>
+<path d="M170 252a30 30 0 0 0 60 0z" fill="#0E1B3D"/><path d="M184 266a18 12 0 0 1 32 0 26 26 0 0 1-32 0z" fill="#D93A3F"/>
+<circle cx="150" cy="244" r="9" fill="#FFC93C" opacity=".7"/><circle cx="250" cy="244" r="9" fill="#FFC93C" opacity=".7"/>
+<g class="gnist" fill="#FFC93C" stroke="#0E1B3D" stroke-width="4" stroke-linejoin="round"><path d="M312 40l-16 26h14l-8 24 26-32h-15z"/></g>
+</svg>
