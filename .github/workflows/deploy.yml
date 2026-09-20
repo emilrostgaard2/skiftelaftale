@@ -1,0 +1,85 @@
+name: Deploy til Simply.com
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Kun ét deploy ad gangen, så to pushes ikke uploader oven i hinanden
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Upload via FTP
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Hent kode
+        uses: actions/checkout@v4
+
+      # Har sitet et build-trin (fx npm run build), så indsæt det her
+      # og ret local-dir nedenfor til build-mappen, fx ./dist/
+
+      - name: Upload til Simply.com
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./
+          server-dir: /public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            **/node_modules/**
+            README.md
+            .env*
+            **/.DS_Storename: Deploy til Simply.com
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Kun ét deploy ad gangen, så to pushes ikke uploader oven i hinanden
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Upload via FTP
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Hent kode
+        uses: actions/checkout@v4
+
+      # Har sitet et build-trin (fx npm run build), så indsæt det her
+      # og ret local-dir nedenfor til build-mappen, fx ./dist/
+
+      - name: Upload til Simply.com
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          port: 21
+          local-dir: ./
+          server-dir: /public_html/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            **/node_modules/**
+            README.md
+            .env*
+            **/.DS_Store
