@@ -136,16 +136,6 @@
         return { kilde: 'Energi Data Service (Energinet)', raekker: rk };
       });
     }
-    // Fallback: elprisenligenu.dk. Priser i DKK/kWh ekskl. moms.
-    function hentFallback(omraade) {
-      var d = new Date();
-      var url = 'https://www.elprisenligenu.dk/api/v1/prices/' + d.getFullYear() + '/' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '_' + omraade + '.json';
-      return hentJson(url).then(function (j) {
-        var rk = j.map(function (x) { return { t: new Date(x.time_start), kr: x.DKK_per_kWh }; });
-        if (!rk.length) throw new Error('Tomt svar');
-        return { kilde: 'Elprisen lige nu.dk', raekker: rk };
-      });
-    }
     // Saml kvarterspriser til timegennemsnit, og læg moms på
     function tilTimer(raekker) {
       var m = {};
@@ -225,7 +215,7 @@
           return '<li><span>' + x[0] + '</span><b class="tal">' + fmtKr(x[1] * nuPris) + '</b><small>billigst i dag: ' + fmtKr(x[1] * min / 100) + '</small></li>'; }).join('');
       }
       try { document.dispatchEvent(new CustomEvent('elpris', { detail: { nu: nuT.ore, min: min, max: max, snit: snit } })); } catch (e) {}
-      saet('#kilde', res.kilde);
+      
       saet('#hentet', 'kl. ' + pad(nu.getHours()) + '.' + pad(nu.getMinutes()));
       live.classList.add('klar');
     }
@@ -236,7 +226,7 @@
     }
     function hent() {
       $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.o === omr ? 'true' : 'false'); });
-      hentEnerginet(omr).catch(function () { return hentFallback(omr); }).then(vis).catch(fejl);
+      hentEnerginet(omr).then(vis).catch(fejl);
     }
     $$('.dagvalg button').forEach(function (b) { b.addEventListener('click', function () { if (b.disabled) return; visDag = b.dataset.d; if (sidste) vis(sidste); }); });
     $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.addEventListener('click', function () {
