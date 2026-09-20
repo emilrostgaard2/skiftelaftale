@@ -14,12 +14,22 @@
     var a = menu.classList.toggle('aaben'); mk.setAttribute('aria-expanded', a ? 'true' : 'false');
   });
 
-  /* ---------- Maskot: tryk på afbryderen ---------- */
+  /* ---------- Maskot: tryk på Stikke -> lyset tænder, og vi ruller ned til beregneren ---------- */
   $$('.stikke[data-vip]').forEach(function (s) {
-    var skift = function () { s.classList.toggle('taendt'); };
-    s.addEventListener('click', skift);
-    s.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); skift(); } });
-    setTimeout(function () { s.classList.add('taendt'); }, 900);
+    var rolig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var tryk = function () {
+      var varTaendt = s.classList.contains('taendt');
+      s.classList.add('taendt');
+      var maal = document.getElementById('beregner');
+      if (!maal) return;
+      setTimeout(function () {
+        maal.scrollIntoView({ behavior: rolig ? 'auto' : 'smooth', block: 'start' });
+        var sl = document.getElementById('forbrug'); if (sl) setTimeout(function () { sl.focus({ preventScroll: true }); }, 700);
+      }, varTaendt ? 0 : 650);
+    };
+    s.addEventListener('mousedown', function (e) { e.preventDefault(); }); // ingen fokusramme ved museklik
+    s.addEventListener('click', tryk);
+    s.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tryk(); } });
   });
 
   /* ---------- Beregner ---------- */
@@ -48,7 +58,8 @@
         return '<li><span class="nr">' + (i + 1) + '</span>' +
           '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' +
           '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a><small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(x.p.abo, 2) + ' kr./md.</small></span>' +
-          '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span></li>';
+          '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span>' +
+          '<a class="knap" href="' + rod + 'go/' + x.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se aftalen hos ' + x.s.navn + ' (reklamelink)">Se aftalen</a></li>';
       }).join('');
       var forskel = r[r.length - 1].aar - r[0].aar;
       if (spar) spar.innerHTML = 'Ved <b>' + kwh.toLocaleString('da-DK') + ' kWh</b> er der <b>' + kr(forskel) + '</b> om året til forskel på den billigste og den dyreste aftale i vores sammenligning.';
@@ -57,6 +68,44 @@
     slider.addEventListener('input', tegn);
     $$('.typer button', ber).forEach(function (b) { b.addEventListener('click', function () { slider.value = b.dataset.kwh; tegn(); }); });
     tegn();
+  }
+
+
+  /* ---------- Indholdsliste: lukket på mobil ---------- */
+  if (window.innerWidth < 820) $$('details.toc').forEach(function (d) { d.removeAttribute('open'); });
+
+  /* ---------- Filtre på rangtabeller ---------- */
+  $$('.rang-blok').forEach(function (blok) {
+    var knapper = $$('.filtre button', blok), rk = $$('tbody tr', blok);
+    if (!knapper.length) return;
+    var test = { binding: function (r) { return r.dataset.binding === '0'; }, bagud: function (r) { return r.dataset.bagud === '1'; },
+      abo: function (r) { return +r.dataset.abo === 0; }, tillaeg: function (r) { return +r.dataset.tillaeg === 0; } };
+    knapper.forEach(function (b) { b.addEventListener('click', function () {
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      var aktive = knapper.filter(function (k) { return k.getAttribute('aria-pressed') === 'true'; }).map(function (k) { return k.dataset.f; });
+      var synlige = 0;
+      rk.forEach(function (r) { if (r.classList.contains('tom-raekke')) return; var ok = aktive.every(function (f) { return test[f](r); }); r.hidden = !ok; if (ok) synlige++; });
+      var tom = $('.tom-raekke', blok);
+      if (!synlige && !tom) { tom = document.createElement('tr'); tom.className = 'tom-raekke'; tom.innerHTML = '<td colspan="7">Ingen aftaler opfylder alle de valgte filtre. Slå et filter fra.</td>'; $('tbody', blok).appendChild(tom); }
+      if (tom) tom.hidden = synlige > 0;
+    }); });
+  });
+
+  /* ---------- Spar-beregner ---------- */
+  var spar = $('#sparberegner');
+  if (spar && data.length) {
+    var fk = $('#sp-kwh'), ft = $('#sp-til'), fa = $('#sp-abo'), ud = $('#sp-tal'), tx = $('#sp-tekst'), kn = $('#sp-knap'), srod = spar.getAttribute('data-rod') || '', vist = 0, raf;
+    var taelOp = function (til) {
+      cancelAnimationFrame(raf); var fra = vist, t0 = null;
+      var trin = function (t) { if (!t0) t0 = t; var f = Math.min(1, (t - t0) / 500); vist = fra + (til - fra) * (1 - Math.pow(1 - f, 3)); ud.textContent = kr(vist) ; if (f < 1) raf = requestAnimationFrame(trin); };
+      raf = requestAnimationFrame(trin);
+    };
+    var regn = function () {
+      var kwh = Math.max(0, +fk.value || 0), nu = (+ft.value || 0) * kwh / 100 + (+fa.value || 0) * 12, b = rangliste(kwh)[0], forskel = nu - b.aar;
+      if (forskel > 0) { taelOp(forskel); tx.innerHTML = 'om året ved at skifte til <b style="font:inherit;color:#fff;font-weight:700">' + b.s.navn + '</b>. Du betaler ' + kr(nu) + ' til dit elselskab i dag. Hos ' + b.s.navn + ' ville det være ' + kr(b.aar); kn.style.display = ''; kn.textContent = 'Gå til ' + b.s.navn; kn.href = srod + 'go/' + b.s.slug + '/'; }
+      else { cancelAnimationFrame(raf); vist = 0; ud.textContent = '0 kr.'; tx.textContent = 'Din aftale er allerede billigere end alle i vores sammenligning. Bliv, hvor du er.'; kn.style.display = 'none'; }
+    };
+    [fk, ft, fa].forEach(function (f) { f.addEventListener('input', regn); }); regn();
   }
 
   /* ---------- Live elpriser ---------- */
@@ -107,9 +156,18 @@
       });
       return Object.keys(m).sort().map(function (k) { return { t: m[k].t, ore: m[k].sum / m[k].n * 100 * 1.25 }; });
     }
+    var visDag = 'idag', sidste = null;
     function vis(res) {
+      sidste = res;
       var timer = tilTimer(res.raekker), nu = new Date(), idag = dagStr(nu);
-      var dag = timer.filter(function (x) { return dagStr(x.t) === idag; });
+      var dagIdag = timer.filter(function (x) { return dagStr(x.t) === idag; });
+      var dagImorgen = timer.filter(function (x) { return dagStr(x.t) > idag; }).slice(0, 25);
+      var harImorgen = dagImorgen.length >= 20;
+      var bm = $('#dag-imorgen'); if (bm) { bm.disabled = !harImorgen; bm.title = harImorgen ? '' : 'Offentliggøres ca. kl. 13'; }
+      if (visDag === 'imorgen' && !harImorgen) visDag = 'idag';
+      $$('.dagvalg button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.d === visDag ? 'true' : 'false'); });
+      var erIdag = visDag === 'idag';
+      var dag = erIdag ? dagIdag : dagImorgen;
       if (!dag.length) dag = timer.slice(0, 24);
       var v = dag.map(function (x) { return x.ore; });
       var min = Math.min.apply(0, v), max = Math.max.apply(0, v), snit = v.reduce(function (a, b) { return a + b; }, 0) / v.length;
@@ -127,7 +185,7 @@
         graf.innerHTML = dag.map(function (x, i) {
           var h = Math.max(3, (x.ore - bund) / span * 100);
           var kl = x.ore <= lavG ? ' lav' : (x.ore >= hojG ? ' hoj' : '');
-          if (x.t.getHours() === nu.getHours()) kl += ' nu';
+          if (erIdag && x.t.getHours() === nu.getHours()) kl += ' nu';
           return '<div class="s' + kl + '" tabindex="0" style="height:' + h.toFixed(1) + '%;animation-delay:' + (i * 18) + 'ms" data-t="kl. ' + pad(x.t.getHours()) + ': ' + ore(x.ore) + ' øre"></div>';
         }).join('');
         graf.setAttribute('aria-label', 'Spotpris time for time i dag i ' + omr + '. Lavest ' + ore(min) + ' øre, højest ' + ore(max) + ' øre pr. kWh inkl. moms.');
@@ -137,6 +195,35 @@
       if (im) im.textContent = imorgen.length >= 20
         ? 'I morgen ligger gennemsnittet på ' + ore(imorgen.reduce(function (a, b) { return a + b.ore; }, 0) / imorgen.length) + ' øre/kWh inkl. moms.'
         : 'Morgendagens priser offentliggøres normalt omkring kl. 13.';
+      // Tabel time for time
+      var tb = $('#timetabel');
+      if (tb) {
+        var cap = $('#tt-cap'); if (cap) cap.textContent = 'Spotpris time for time ' + (erIdag ? 'i dag' : 'i morgen') + ', ' + (omr === 'DK1' ? 'Vestdanmark (DK1)' : 'Østdanmark (DK2)');
+        tb.innerHTML = dag.map(function (x) {
+          var d = x.ore - snit, niv = x.ore <= min + (max - min) * 0.33 ? ['gron', 'Billig'] : (x.ore >= min + (max - min) * 0.72 ? ['rod', 'Dyr'] : ['', 'Middel']);
+          var erNu = erIdag && x.t.getHours() === nu.getHours();
+          return '<tr' + (erNu ? ' class="vinder"' : '') + '><th scope="row" data-label="Time">kl. ' + pad(x.t.getHours()) + '–' + pad((x.t.getHours() + 1) % 24) + (erNu ? ' <span class="maerke gul">Nu</span>' : '') + '</th>' +
+            '<td class="tal" data-label="Spotpris inkl. moms"><b>' + ore(x.ore) + ' øre</b></td><td class="tal" data-label="Mod døgnets snit">' + (d >= 0 ? '+' : '−') + ore(Math.abs(d)) + ' øre</td>' +
+            '<td data-label="Niveau"><span class="maerke ' + niv[0] + '">' + niv[1] + '</span></td></tr>';
+        }).join('');
+      }
+      // Billigste sammenhængende timer (kun fremtidige timer, når vi ser på i dag)
+      var vu = $('#vinduer');
+      if (vu) {
+        var fra = erIdag ? dagIdag.filter(function (x) { return x.t.getHours() >= nu.getHours(); }).concat(harImorgen ? dagImorgen : []) : dag;
+        var bedst = function (n) { var b = null; for (var i = 0; i + n <= fra.length; i++) { var sum = 0; for (var j = 0; j < n; j++) sum += fra[i + j].ore; if (!b || sum < b.sum) b = { i: i, sum: sum }; } return b; };
+        vu.innerHTML = [[2, 'Vask eller opvask (2 timer)'], [4, 'Tørretumbler + vask (4 timer)'], [6, 'Opladning af elbil (6 timer)']].map(function (v) {
+          var b = bedst(v[0]); if (!b) return '<li><span>' + v[1] + '</span><b>Vent på morgendagens priser (ca. kl. 13)</b></li>';
+          var st = fra[b.i].t.getHours(), sl = (fra[b.i + v[0] - 1].t.getHours() + 1) % 24;
+          return '<li><span>' + v[1] + '</span><b class="tal">' + (erIdag && dagStr(fra[b.i].t) > idag ? 'i morgen ' : '') + 'kl. ' + pad(st) + '–' + pad(sl) + '</b><small>snit ' + ore(b.sum / v[0]) + ' øre/kWh</small></li>';
+        }).join('');
+      }
+      var ek = $('#eksempler');
+      if (ek) {
+        var nuPris = (erIdag ? nuT.ore : snit) / 100, fmtKr = function (n) { return n.toLocaleString('da-DK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kr.'; };
+        ek.innerHTML = [['En vask (0,8 kWh)', 0.8], ['En opvask (1 kWh)', 1], ['En tur i tørretumbleren (2 kWh)', 2], ['Opladning af elbil (40 kWh)', 40]].map(function (x) {
+          return '<li><span>' + x[0] + '</span><b class="tal">' + fmtKr(x[1] * nuPris) + '</b><small>billigst i dag: ' + fmtKr(x[1] * min / 100) + '</small></li>'; }).join('');
+      }
       saet('#kilde', res.kilde);
       saet('#hentet', 'kl. ' + pad(nu.getHours()) + '.' + pad(nu.getMinutes()));
       live.classList.add('klar');
@@ -147,10 +234,11 @@
       if (graf) graf.innerHTML = '<p class="graf-fejl">Vi kan ikke hente dagens priser lige nu. Prøv at genindlæse siden om lidt – eller se priserne direkte hos <a href="https://www.energidataservice.dk/" rel="noopener">Energi Data Service</a>.</p>';
     }
     function hent() {
-      $$('.omraade button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.o === omr ? 'true' : 'false'); });
+      $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.o === omr ? 'true' : 'false'); });
       hentEnerginet(omr).catch(function () { return hentFallback(omr); }).then(vis).catch(fejl);
     }
-    $$('.omraade button').forEach(function (b) { b.addEventListener('click', function () {
+    $$('.dagvalg button').forEach(function (b) { b.addEventListener('click', function () { if (b.disabled) return; visDag = b.dataset.d; if (sidste) vis(sidste); }); });
+    $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.addEventListener('click', function () {
       omr = b.dataset.o; try { localStorage.setItem('omraade', omr); } catch (e) {} hent();
     }); });
     hent();

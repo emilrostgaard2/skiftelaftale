@@ -13,6 +13,9 @@ README.md bliver ikke deployet (den er udelukket i deploy.yml).
 4. **404-side**: tilføj `ErrorDocument 404 /404.html` i .htaccess hos Simply.
 5. **Google Search Console**: indsend https://skiftelaftale.dk/sitemap.xml
 
+## Ved hver udgivelse
+Tæl VERSION op i src/kerne.py (cache-buster), så browsere henter ny css/js.
+
 ## Hver måned
 Titlerne indeholder måneden (fx "september 2026"). Ret MAANED, TJEKKET og TJEKKET_ISO øverst i src/kerne.py og byg igen,
 eller bed om en ny zip.

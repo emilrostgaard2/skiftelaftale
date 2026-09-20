@@ -439,3 +439,52 @@ details.toc[open] summary::after{content:"–"}
 details.toc .toc-linje{margin:8px 0 0}
 @media (max-width:820px){table.stak caption{display:block;width:100%}}
 @media (max-width:820px){table.stak td.cta::before{display:none}}
+
+/* ===== v3 ===== */
+.foto{border-radius:50%;object-fit:cover;flex:none;background:var(--plade)}
+.forfatter .foto{width:72px;height:72px;border-radius:22px}
+.meta .af{gap:8px}.meta .af .foto{width:32px;height:32px}
+.om-person{display:grid;grid-template-columns:140px 1fr;gap:24px;align-items:center}.om-person .foto{width:140px;height:140px;border-radius:32px}
+@media (max-width:600px){.om-person{grid-template-columns:1fr}}
+.hero-b{padding:26px 0 40px}
+.hero-b h1{font-size:clamp(2rem,4.3vw,3.05rem)}
+.hero-b .meta{margin-top:18px}
+.top3-h{font:800 1.2rem/1.2 var(--display);letter-spacing:-.02em;margin:0 0 12px}
+.top3-h small{display:block;font:500 .85rem var(--tekst);color:var(--nat-2);letter-spacing:0;margin-top:3px}
+.top3.hv li{grid-template-columns:minmax(0,1.1fr) 84px auto auto}
+.hv-type{display:flex;flex-wrap:wrap;gap:0 6px;align-items:baseline;line-height:1.2;font-size:.95rem}.hv-type small{width:100%;color:var(--nat-2);font-size:.78rem;padding-left:1.7em}
+@media (max-width:520px){.top3.hv li{grid-template-columns:minmax(0,1fr) 64px auto}.top3.hv li .knap{grid-column:1/-1}}
+figure.bil{margin:32px 0;max-width:780px}
+figure.bil img{border-radius:22px;width:100%;height:auto;box-shadow:var(--skygge-plade)}
+figure.bil figcaption{font-size:.9rem;color:var(--nat-2);margin-top:10px}
+.smal-kort{max-width:520px;margin:22px 0}
+/* graf */
+.kurve-boks{padding:18px 14px 14px;overflow:visible}
+.kurve{min-width:0;width:100%;height:auto;display:block}
+.kurve .akse{fill:var(--nat-3);font-family:var(--tekst);font-weight:500}
+.kurve text{font-family:var(--tekst)}
+.k-mobil{display:none}
+@media (max-width:760px){.k-desktop{display:none}.k-mobil{display:block}}
+.kurve-leg{list-style:none;display:flex;flex-wrap:wrap;gap:6px 16px;padding:12px 6px 0;margin:0;font-size:.86rem;font-weight:600;border-top:1px dashed var(--kant);margin-top:8px}
+.kurve-leg li{margin:0;display:flex;align-items:center;gap:6px}.kurve-leg i{width:14px;height:6px;border-radius:3px;display:inline-block}
+.kurve-leg li:nth-last-child(-n+2){font-weight:500;color:var(--nat-2)}.kurve-leg li:nth-last-child(-n+2) i{height:12px;width:12px}
+/* elpriser */
+.dagvalg button:disabled{opacity:.45;cursor:not-allowed}
+#live > div:first-child{gap:10px}
+.el-ekstra{margin-top:20px}.el-ekstra .plade{padding:20px 22px}
+.h-lille{font-size:1.15rem;margin:0 0 12px}
+.vinduer,.eksempler{list-style:none;padding:0;margin:0 0 10px;display:grid;gap:8px}
+.vinduer li,.eksempler li{display:grid;grid-template-columns:1fr auto;gap:0 12px;align-items:baseline;margin:0;padding:10px 12px;border-radius:12px;background:var(--plade)}
+.vinduer li b,.eksempler li b{font:800 1.08rem var(--display)}
+.vinduer li small,.eksempler li small{grid-column:1/-1;color:var(--nat-2);font-size:.8rem}
+.vinduer li b{color:#0A6B3D}
+table.timetabel td,table.timetabel th{padding:9px 14px}
+@media (max-width:820px){table.timetabel.stak tr{grid-template-columns:1.2fr 1fr 1fr;padding:10px 14px;align-items:center}table.timetabel.stak tbody th[scope=row]{grid-column:auto;font-size:.95rem}table.timetabel.stak td[data-label="Mod døgnets snit"]{display:none}table.timetabel.stak td::before{display:none!important}}
+/* skift-siden */
+.tidslinje{list-style:none;padding:0;margin:24px 0;display:grid;grid-template-columns:repeat(4,1fr);gap:0;counter-reset:tl}
+.tidslinje li{position:relative;padding:34px 16px 0 0;margin:0;border-top:4px solid var(--strom)}
+.tidslinje li::before{content:"";position:absolute;top:-12px;left:0;width:20px;height:20px;border-radius:50%;background:var(--sol);border:4px solid var(--nat)}
+.tidslinje b{display:block;font-family:var(--display);font-size:1.05rem}.tidslinje span{color:var(--nat-2);font-size:.93rem}
+@media (max-width:760px){.tidslinje{grid-template-columns:1fr}.tidslinje li{border-top:0;border-left:4px solid var(--strom);padding:0 0 22px 22px}.tidslinje li::before{top:0;left:-12px}}
+.tjek{list-style:none;padding:0}.tjek li{padding-left:34px;position:relative;margin-bottom:10px}
+.tjek li::before{content:"";position:absolute;left:0;top:.2em;width:22px;height:22px;border-radius:7px;background:var(--billig) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.4l2.6 2.6L13 6.6' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain}
