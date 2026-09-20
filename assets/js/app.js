@@ -224,6 +224,7 @@
         ek.innerHTML = [['En vask (0,8 kWh)', 0.8], ['En opvask (1 kWh)', 1], ['En tur i tørretumbleren (2 kWh)', 2], ['Opladning af elbil (40 kWh)', 40]].map(function (x) {
           return '<li><span>' + x[0] + '</span><b class="tal">' + fmtKr(x[1] * nuPris) + '</b><small>billigst i dag: ' + fmtKr(x[1] * min / 100) + '</small></li>'; }).join('');
       }
+      try { document.dispatchEvent(new CustomEvent('elpris', { detail: { nu: nuT.ore, min: min, max: max, snit: snit } })); } catch (e) {}
       saet('#kilde', res.kilde);
       saet('#hentet', 'kl. ' + pad(nu.getHours()) + '.' + pad(nu.getMinutes()));
       live.classList.add('klar');
@@ -242,6 +243,48 @@
       omr = b.dataset.o; try { localStorage.setItem('omraade', omr); } catch (e) {} hent();
     }); });
     hent();
+  }
+
+
+  /* ---------- Apparat-tabeller: pris ved spotprisen lige nu ---------- */
+  if ($('table.apparater')) document.addEventListener('elpris', function (ev) {
+    var d = ev.detail, f2 = function (n) { return n.toLocaleString('da-DK', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kr.'; };
+    $$('table.apparater tbody tr').forEach(function (r) {
+      var k = +r.dataset.kwh, a = $('.nu b', r), b = $('.lav', r);
+      if (a) a.textContent = f2(k * d.nu / 100); if (b) b.textContent = f2(k * d.min / 100);
+    });
+  });
+
+  /* ---------- Statistik, seneste 30 dage (hentes først, når sektionen er tæt på) ---------- */
+  var st = $('#stat30');
+  if (st) {
+    var p2 = function (n) { return (n < 10 ? '0' : '') + n; }, ds = function (d) { return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()); };
+    var hentet = null;
+    var hentStat = function () {
+      var o = 'DK1'; try { o = localStorage.getItem('omraade') || 'DK1'; } catch (e) {}
+      if (hentet === o) return; hentet = o;
+      var til = new Date(), fra = new Date(til.getTime() - 30 * 864e5);
+      var url = 'https://api.energidataservice.dk/dataset/DayAheadPrices?start=' + ds(fra) + 'T00:00&end=' + ds(til) + 'T00:00&filter=' + encodeURIComponent(JSON.stringify({ PriceArea: [o] })) + '&limit=4000';
+      fetch(url).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (j) {
+        var rk = (j.records || []).map(function (x) { return { t: new Date(x.TimeDK || x.HourDK), o: (x.DayAheadPriceDKK != null ? x.DayAheadPriceDKK : x.SpotPriceDKK) / 10 * 1.25 }; }).filter(function (x) { return !isNaN(x.t) && isFinite(x.o); });
+        if (rk.length < 200) throw 0;
+        var T = [], U = [], i; for (i = 0; i < 24; i++) T.push([0, 0]); for (i = 0; i < 7; i++) U.push([0, 0]);
+        var sum = 0, timer = {};
+        rk.forEach(function (x) { var h = x.t.getHours(), u = (x.t.getDay() + 6) % 7; T[h][0] += x.o; T[h][1]++; U[u][0] += x.o; U[u][1]++; sum += x.o; var k = ds(x.t) + h; (timer[k] = timer[k] || [0, 0]); timer[k][0] += x.o; timer[k][1]++; });
+        var tS = T.map(function (a) { return a[1] ? a[0] / a[1] : 0; }), uS = U.map(function (a) { return a[1] ? a[0] / a[1] : 0; });
+        var neg = Object.keys(timer).filter(function (k) { return timer[k][0] / timer[k][1] < 0; }).length;
+        var mi = tS.indexOf(Math.min.apply(0, tS)), ma = tS.indexOf(Math.max.apply(0, tS));
+        var saet2 = function (id, v) { var el = $(id); if (el) el.textContent = v; };
+        saet2('#s-snit', ore(sum / rk.length)); saet2('#s-billig', 'kl. ' + p2(mi) + '–' + p2((mi + 1) % 24)); saet2('#s-dyr', 'kl. ' + p2(ma) + '–' + p2((ma + 1) % 24)); saet2('#s-neg', neg);
+        var tegn = function (id, v, navne) { var top = Math.max.apply(0, v.concat([1])), lo = Math.min.apply(0, v), hi = Math.max.apply(0, v);
+          $(id).innerHTML = v.map(function (x, i) { var kl = x <= lo + (hi - lo) * 0.33 ? ' lav' : (x >= lo + (hi - lo) * 0.72 ? ' hoj' : ''); return '<div class="s' + kl + '" tabindex="0" style="height:' + Math.max(4, x / top * 100).toFixed(1) + '%;animation-delay:' + i * 15 + 'ms" data-t="' + navne(i) + ': ' + ore(x) + ' øre"></div>'; }).join(''); };
+        tegn('#s-timer', tS, function (i) { return 'kl. ' + p2(i); }); tegn('#s-uge', uS, function (i) { return ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'][i]; });
+        var dage = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'], bu = uS.indexOf(Math.min.apply(0, uS));
+        saet2('#s-tekst', 'De seneste 30 dage i ' + (o === 'DK1' ? 'Vestdanmark' : 'Østdanmark') + ': i gennemsnit var strømmen billigst kl. ' + p2(mi) + '–' + p2((mi + 1) % 24) + ' (' + ore(tS[mi]) + ' øre) og dyrest kl. ' + p2(ma) + '–' + p2((ma + 1) % 24) + ' (' + ore(tS[ma]) + ' øre). Billigste ugedag var ' + dage[bu] + '. Spotpris inkl. moms. Kilde: Energi Data Service (Energinet).');
+      }).catch(function () { hentet = null; var g = $('#s-timer'); if (g) g.innerHTML = '<p class="graf-fejl">Statistikken kan ikke hentes lige nu.</p>'; });
+    };
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es, io) { if (es[0].isIntersecting) { hentStat(); } }, { rootMargin: '600px' }).observe(st); else hentStat();
+    $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.addEventListener('click', function () { setTimeout(hentStat, 50); }); });
   }
 
   /* ---------- Indholdsfortegnelse: markér aktiv sektion ---------- */

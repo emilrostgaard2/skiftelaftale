@@ -488,3 +488,12 @@ table.timetabel td,table.timetabel th{padding:9px 14px}
 @media (max-width:760px){.tidslinje{grid-template-columns:1fr}.tidslinje li{border-top:0;border-left:4px solid var(--strom);padding:0 0 22px 22px}.tidslinje li::before{top:0;left:-12px}}
 .tjek{list-style:none;padding:0}.tjek li{padding-left:34px;position:relative;margin-bottom:10px}
 .tjek li::before{content:"";position:absolute;left:0;top:.2em;width:22px;height:22px;border-radius:7px;background:var(--billig) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M5 9.4l2.6 2.6L13 6.6' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain}
+
+/* ===== v4 ===== */
+.graf.mini{height:150px;padding-top:10px}
+.graf.mini .s{flex:1 1 0;min-width:0}
+.graf-akse.uge{justify-content:space-around}
+.stat30 .gitter-2{margin-top:6px}.stat30 .plade{padding:18px 18px 12px}
+table.apparater td.nu b{font-family:var(--display);font-size:1.02rem}
+table.apparater td.lav{color:#0A6B3D;font-weight:600}
+@media (max-width:1000px){.menu a{padding:9px 9px;font-size:.93rem}}
