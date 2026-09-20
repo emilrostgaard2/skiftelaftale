@@ -6,7 +6,7 @@
   var kr = function (n) { return Math.round(n).toLocaleString('da-DK') + ' kr.'; };
   var ore = function (n) { return (Math.round(n * 10) / 10).toLocaleString('da-DK', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
 
-  var tal = function (n, d) { return Number.isInteger(n) ? String(n) : n.toLocaleString('da-DK', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var fmt = function (n, d) { return Number.isInteger(n) ? String(n) : n.toLocaleString('da-DK', { minimumFractionDigits: d, maximumFractionDigits: d }); };
 
   /* ---------- Menu ---------- */
   var mk = $('.menu-knap'), menu = $('.menu');
@@ -47,7 +47,7 @@
       ul.innerHTML = r.map(function (x, i) {
         return '<li><span class="nr">' + (i + 1) + '</span>' +
           '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' +
-          '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a><small>' + x.p.navn + ': ' + tal(x.p.tillaeg, 1) + ' øre/kWh + ' + tal(x.p.abo, 2) + ' kr./md.</small></span>' +
+          '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a><small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(x.p.abo, 2) + ' kr./md.</small></span>' +
           '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span></li>';
       }).join('');
       var forskel = r[r.length - 1].aar - r[0].aar;
@@ -67,12 +67,18 @@
     var pad = function (n) { return (n < 10 ? '0' : '') + n; };
     var dagStr = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
 
+    // fetch med timeout, så en kilde der hænger ikke blokerer fallback
+    function hentJson(url) {
+      var c = ('AbortController' in window) ? new AbortController() : null;
+      var t = setTimeout(function () { if (c) c.abort(); }, 8000);
+      return fetch(url, c ? { signal: c.signal } : {}).then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    }
     // Primær kilde: Energi Data Service (Energinet). Priser i DKK/MWh ekskl. moms.
     function hentEnerginet(omraade) {
       var i = new Date(), im = new Date(i.getTime() + 2 * 864e5);
       var url = 'https://api.energidataservice.dk/dataset/DayAheadPrices?start=' + dagStr(i) + 'T00:00&end=' + dagStr(im) + 'T00:00' +
         '&filter=' + encodeURIComponent(JSON.stringify({ PriceArea: [omraade] })) + '&sort=TimeDK%20asc&limit=400';
-      return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
+      return hentJson(url).then(function (j) {
         var rk = (j.records || []).map(function (x) {
           var t = x.TimeDK || x.HourDK, p = x.DayAheadPriceDKK != null ? x.DayAheadPriceDKK : x.SpotPriceDKK;
           return { t: new Date(t), kr: p / 1000 };
@@ -85,7 +91,7 @@
     function hentFallback(omraade) {
       var d = new Date();
       var url = 'https://www.elprisenligenu.dk/api/v1/prices/' + d.getFullYear() + '/' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '_' + omraade + '.json';
-      return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
+      return hentJson(url).then(function (j) {
         var rk = j.map(function (x) { return { t: new Date(x.time_start), kr: x.DKK_per_kWh }; });
         if (!rk.length) throw new Error('Tomt svar');
         return { kilde: 'Elprisen lige nu.dk', raekker: rk };
