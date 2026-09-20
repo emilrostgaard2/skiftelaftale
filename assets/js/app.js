@@ -6,7 +6,7 @@
   var kr = function (n) { return Math.round(n).toLocaleString('da-DK') + ' kr.'; };
   var ore = function (n) { return (Math.round(n * 10) / 10).toLocaleString('da-DK', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); };
 
-  var tal = function (n, d) { return Number.isInteger(n) ? String(n) : n.toLocaleString('da-DK', { minimumFractionDigits: d, maximumFractionDigits: d }); };
+  var fmt = function (n, d) { return Number.isInteger(n) ? String(n) : n.toLocaleString('da-DK', { minimumFractionDigits: d, maximumFractionDigits: d }); };
 
   /* ---------- Menu ---------- */
   var mk = $('.menu-knap'), menu = $('.menu');
@@ -14,12 +14,22 @@
     var a = menu.classList.toggle('aaben'); mk.setAttribute('aria-expanded', a ? 'true' : 'false');
   });
 
-  /* ---------- Maskot: tryk på afbryderen ---------- */
+  /* ---------- Maskot: tryk på Stikke -> lyset tænder, og vi ruller ned til beregneren ---------- */
   $$('.stikke[data-vip]').forEach(function (s) {
-    var skift = function () { s.classList.toggle('taendt'); };
-    s.addEventListener('click', skift);
-    s.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); skift(); } });
-    setTimeout(function () { s.classList.add('taendt'); }, 900);
+    var rolig = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var tryk = function () {
+      var varTaendt = s.classList.contains('taendt');
+      s.classList.add('taendt');
+      var maal = document.getElementById('beregner');
+      if (!maal) return;
+      setTimeout(function () {
+        maal.scrollIntoView({ behavior: rolig ? 'auto' : 'smooth', block: 'start' });
+        var sl = document.getElementById('forbrug'); if (sl) setTimeout(function () { sl.focus({ preventScroll: true }); }, 700);
+      }, varTaendt ? 0 : 650);
+    };
+    s.addEventListener('mousedown', function (e) { e.preventDefault(); }); // ingen fokusramme ved museklik
+    s.addEventListener('click', tryk);
+    s.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tryk(); } });
   });
 
   /* ---------- Beregner ---------- */
@@ -47,8 +57,9 @@
       ul.innerHTML = r.map(function (x, i) {
         return '<li><span class="nr">' + (i + 1) + '</span>' +
           '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' +
-          '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a><small>' + x.p.navn + ': ' + tal(x.p.tillaeg, 1) + ' øre/kWh + ' + tal(x.p.abo, 2) + ' kr./md.</small></span>' +
-          '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span></li>';
+          '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a><small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(x.p.abo, 2) + ' kr./md.</small></span>' +
+          '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span>' +
+          '<a class="knap" href="' + rod + 'go/' + x.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se aftalen hos ' + x.s.navn + ' (reklamelink)">Se aftalen</a></li>';
       }).join('');
       var forskel = r[r.length - 1].aar - r[0].aar;
       if (spar) spar.innerHTML = 'Ved <b>' + kwh.toLocaleString('da-DK') + ' kWh</b> er der <b>' + kr(forskel) + '</b> om året til forskel på den billigste og den dyreste aftale i vores sammenligning.';
@@ -59,6 +70,44 @@
     tegn();
   }
 
+
+  /* ---------- Indholdsliste: lukket på mobil ---------- */
+  if (window.innerWidth < 820) $$('details.toc').forEach(function (d) { d.removeAttribute('open'); });
+
+  /* ---------- Filtre på rangtabeller ---------- */
+  $$('.rang-blok').forEach(function (blok) {
+    var knapper = $$('.filtre button', blok), rk = $$('tbody tr', blok);
+    if (!knapper.length) return;
+    var test = { binding: function (r) { return r.dataset.binding === '0'; }, bagud: function (r) { return r.dataset.bagud === '1'; },
+      abo: function (r) { return +r.dataset.abo === 0; }, tillaeg: function (r) { return +r.dataset.tillaeg === 0; } };
+    knapper.forEach(function (b) { b.addEventListener('click', function () {
+      b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+      var aktive = knapper.filter(function (k) { return k.getAttribute('aria-pressed') === 'true'; }).map(function (k) { return k.dataset.f; });
+      var synlige = 0;
+      rk.forEach(function (r) { if (r.classList.contains('tom-raekke')) return; var ok = aktive.every(function (f) { return test[f](r); }); r.hidden = !ok; if (ok) synlige++; });
+      var tom = $('.tom-raekke', blok);
+      if (!synlige && !tom) { tom = document.createElement('tr'); tom.className = 'tom-raekke'; tom.innerHTML = '<td colspan="7">Ingen aftaler opfylder alle de valgte filtre. Slå et filter fra.</td>'; $('tbody', blok).appendChild(tom); }
+      if (tom) tom.hidden = synlige > 0;
+    }); });
+  });
+
+  /* ---------- Spar-beregner ---------- */
+  var spar = $('#spar');
+  if (spar && data.length) {
+    var fk = $('#sp-kwh'), ft = $('#sp-til'), fa = $('#sp-abo'), ud = $('#sp-tal'), tx = $('#sp-tekst'), kn = $('#sp-knap'), srod = spar.getAttribute('data-rod') || '', vist = 0, raf;
+    var taelOp = function (til) {
+      cancelAnimationFrame(raf); var fra = vist, t0 = null;
+      var trin = function (t) { if (!t0) t0 = t; var f = Math.min(1, (t - t0) / 500); vist = fra + (til - fra) * (1 - Math.pow(1 - f, 3)); ud.textContent = kr(vist) ; if (f < 1) raf = requestAnimationFrame(trin); };
+      raf = requestAnimationFrame(trin);
+    };
+    var regn = function () {
+      var kwh = Math.max(0, +fk.value || 0), nu = (+ft.value || 0) * kwh / 100 + (+fa.value || 0) * 12, b = rangliste(kwh)[0], forskel = nu - b.aar;
+      if (forskel > 0) { taelOp(forskel); tx.innerHTML = 'om året ved at skifte til <b style="font:inherit;color:#fff;font-weight:700">' + b.s.navn + '</b>. Du betaler ' + kr(nu) + ' til dit elselskab i dag. Hos ' + b.s.navn + ' ville det være ' + kr(b.aar); kn.style.display = ''; kn.textContent = 'Gå til ' + b.s.navn; kn.href = srod + 'go/' + b.s.slug + '/'; }
+      else { cancelAnimationFrame(raf); vist = 0; ud.textContent = '0 kr.'; tx.textContent = 'Din aftale er allerede billigere end alle i vores sammenligning. Bliv, hvor du er.'; kn.style.display = 'none'; }
+    };
+    [fk, ft, fa].forEach(function (f) { f.addEventListener('input', regn); }); regn();
+  }
+
   /* ---------- Live elpriser ---------- */
   var live = $('#live');
   if (live) {
@@ -67,12 +116,18 @@
     var pad = function (n) { return (n < 10 ? '0' : '') + n; };
     var dagStr = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
 
+    // fetch med timeout, så en kilde der hænger ikke blokerer fallback
+    function hentJson(url) {
+      var c = ('AbortController' in window) ? new AbortController() : null;
+      var t = setTimeout(function () { if (c) c.abort(); }, 8000);
+      return fetch(url, c ? { signal: c.signal } : {}).then(function (r) { clearTimeout(t); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); });
+    }
     // Primær kilde: Energi Data Service (Energinet). Priser i DKK/MWh ekskl. moms.
     function hentEnerginet(omraade) {
       var i = new Date(), im = new Date(i.getTime() + 2 * 864e5);
       var url = 'https://api.energidataservice.dk/dataset/DayAheadPrices?start=' + dagStr(i) + 'T00:00&end=' + dagStr(im) + 'T00:00' +
         '&filter=' + encodeURIComponent(JSON.stringify({ PriceArea: [omraade] })) + '&sort=TimeDK%20asc&limit=400';
-      return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
+      return hentJson(url).then(function (j) {
         var rk = (j.records || []).map(function (x) {
           var t = x.TimeDK || x.HourDK, p = x.DayAheadPriceDKK != null ? x.DayAheadPriceDKK : x.SpotPriceDKK;
           return { t: new Date(t), kr: p / 1000 };
@@ -85,7 +140,7 @@
     function hentFallback(omraade) {
       var d = new Date();
       var url = 'https://www.elprisenligenu.dk/api/v1/prices/' + d.getFullYear() + '/' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + '_' + omraade + '.json';
-      return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (j) {
+      return hentJson(url).then(function (j) {
         var rk = j.map(function (x) { return { t: new Date(x.time_start), kr: x.DKK_per_kWh }; });
         if (!rk.length) throw new Error('Tomt svar');
         return { kilde: 'Elprisen lige nu.dk', raekker: rk };

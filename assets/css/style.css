@@ -323,3 +323,119 @@ a.s-kort:hover h3{color:var(--strom)}
   *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
 }
 @media print{.top,.fod,.mobil-cta,.oplysning,.indhold,.baand{display:none}}
+
+/* ===== v2 ===== */
+.svag{color:var(--nat-2);font-size:.88rem}
+.logo svg{width:40px;height:40px;border-radius:11px;box-shadow:0 6px 14px -8px rgba(36,71,249,.9)}
+.logo .vip{transform-origin:center;transition:transform .3s cubic-bezier(.3,1.5,.5,1)}
+.logo:hover .vip{transform:translateX(-16px)}
+
+/* Hero: lavere, med top 3-kort */
+.hero{padding:22px 0 38px}
+.hero h1{font-size:clamp(2rem,4.3vw,3.05rem)}
+.hero p.led{font-size:1.1rem}
+.hero-knapper{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0 0}
+.hero-punkter{margin-top:16px;font-size:.93rem}
+.hero-gitter{grid-template-columns:minmax(0,1fr) minmax(0,470px);gap:44px}
+.hero-kort{position:relative;padding-top:64px}
+.hero-stikke{position:absolute;right:18px;top:-6px;width:118px;max-width:none;margin:0;cursor:pointer;filter:drop-shadow(0 10px 12px rgba(14,27,61,.2));z-index:2;transition:transform .2s}
+.hero-stikke:hover{transform:translateY(-4px) rotate(-3deg)}
+.top3{padding:20px;position:relative}
+.top3 h2{font-size:1.2rem;margin:0 0 12px}
+.top3 h2 small{display:block;font:500 .88rem var(--tekst);color:var(--nat-2);letter-spacing:0;margin-top:2px}
+.top3 ol{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.top3 li{display:grid;grid-template-columns:22px 84px minmax(0,1fr) auto auto;gap:10px;align-items:center;margin:0;padding:10px 12px;border:1px solid var(--kant);border-radius:14px;background:#fff}
+.top3 li:first-child{border:2px solid var(--billig);background:linear-gradient(90deg,var(--billig-lys),#fff 70%)}
+.top3 .nr{font:800 1rem var(--display);color:var(--nat-3);text-align:center}
+.top3 li:first-child .nr{color:var(--billig)}
+.top3 img{max-height:28px;width:auto;max-width:84px;object-fit:contain}
+.top3 .n{line-height:1.2;font-weight:700;font-size:.97rem}.top3 .n a{color:var(--nat);text-decoration:none}.top3 .n a:hover{text-decoration:underline}
+.top3 .n small{display:block;font-weight:500;color:var(--nat-2);font-size:.78rem}
+.top3 li > b{font:800 1.05rem var(--display);text-align:right;line-height:1.1;white-space:nowrap}
+.top3 li > b small{display:block;font:500 .72rem var(--tekst);color:var(--nat-2)}
+.top3-alle{display:block;text-align:center;margin-top:12px;font-weight:700;font-size:.95rem}
+@media (max-width:900px){.hero-gitter{grid-template-columns:1fr;gap:10px}.hero-kort{padding-top:50px}.hero-stikke{width:96px;right:10px}}
+@media (max-width:520px){.top3 li{grid-template-columns:20px 64px minmax(0,1fr) auto;row-gap:8px}.top3 img{max-width:64px}.top3 li .knap{grid-column:1/-1}}
+
+/* Beregner-rækker med CTA */
+.resultat li{grid-template-columns:30px 92px minmax(0,1fr) auto auto}
+.resultat .knap{padding:9px 14px;font-size:.9rem}
+@media (max-width:700px){.resultat li{grid-template-columns:24px 70px minmax(0,1fr)}.resultat .pris{grid-column:2/-1;text-align:left;display:flex;gap:8px;align-items:baseline}.resultat .knap{grid-column:1/-1}}
+
+/* Rangtabel: passer uden vandret scroll */
+table.rang{font-size:.94rem}
+table.rang th,table.rang td{padding:12px 12px}
+table.rang thead th{white-space:normal;line-height:1.2}
+.t-logo{min-width:0}
+.t-logo .nr{font:800 1.05rem var(--display);color:var(--nat-3);width:22px;text-align:center;flex:none}
+tr.vinder .t-logo .nr{color:var(--billig)}
+.t-logo .maerke{margin:4px 4px 0 0}
+table.rang td.pris{min-width:130px}
+table.rang .stjerner{font-size:1rem}
+tr[hidden]{display:none}
+.filtre{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:18px 0 -8px;font-size:.92rem;color:var(--nat-2)}
+.filtre button{border:1px solid var(--kant);background:#fff;border-radius:999px;padding:7px 13px;font:600 .88rem var(--tekst);color:var(--nat);cursor:pointer}
+.filtre button:hover{border-color:var(--strom)}
+.filtre button[aria-pressed="true"]{background:var(--strom);border-color:var(--strom);color:#fff}
+.tom-raekke td{text-align:center;color:var(--nat-2);padding:26px}
+@media (max-width:1080px){table.rang .bar{display:none}table.rang td.pris{min-width:0}}
+
+/* Mobil: alle tabeller med hoved bliver til kort – ingen sidelæns scroll */
+@media (max-width:820px){
+  table.stak thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  table.stak,table.stak tbody{display:block;width:100%}
+  table.stak tr{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;padding:16px;border-bottom:1px solid var(--kant)}
+  table.stak tr:last-child{border-bottom:0}
+  table.stak td,table.stak th{display:block;padding:0;border:0;text-align:left!important;white-space:normal}
+  table.stak td[data-label]::before,table.stak tbody th[data-label]:not([scope])::before{content:attr(data-label);display:block;font-size:.74rem;font-weight:600;color:var(--nat-3);margin-bottom:1px}
+  table.stak tbody th[scope="row"]{grid-column:1/-1;font-size:1.02rem}
+  table.stak td.cta{grid-column:1/-1}
+  table.stak td.cta .knap{width:100%}
+  table.stak td:empty{display:none}
+  .tabel-rul{overflow:visible}
+}
+
+/* Billigste-siden */
+.prosa.fuld{max-width:none}
+.prosa.fuld > p,.prosa.fuld > ul,.prosa.fuld > ol,.prosa.fuld > h3,.prosa.fuld > .notits,.prosa.fuld > .stikke-siger,.prosa.fuld > .faq,.prosa.fuld > .forfatter{max-width:780px}
+.toc-linje{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:center;font-size:.9rem;margin-bottom:22px}
+.toc-linje strong{margin-right:4px}
+.toc-linje a{background:var(--plade);border-radius:999px;padding:6px 12px;color:var(--nat);text-decoration:none;font-weight:600}
+.toc-linje a:hover{background:var(--strom-lys)}
+.vkort{display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding:20px}
+.vkort .vk-type{font-weight:700}.vkort .vk-type small{font-weight:500;color:var(--nat-2)}
+.vkort .vk-logo{height:48px;display:flex;align-items:center}.vkort .vk-logo img{max-height:40px;max-width:140px;width:auto;object-fit:contain}
+.vkort > b{font:800 1.9rem/1 var(--display);letter-spacing:-.03em}.vkort > b small{font:500 .9rem var(--tekst);color:var(--nat-2);letter-spacing:0}
+.vkort .knap{width:100%;margin-top:8px}.vkort .annonce{align-self:center}
+.vkort > a.svag{align-self:center}
+.kat .plade{padding:20px 22px}.kat h3{margin:0 0 10px;font-size:1.12rem}.kat ol{margin:0 0 10px;padding-left:1.2em}.kat li{font-size:.95rem}.kat p{margin:0}
+.laes a{display:flex;flex-direction:column;gap:4px;text-decoration:none;color:var(--nat);padding:18px 20px}.laes a:hover{border-color:var(--strom)}.laes b{font-family:var(--display)}
+.kurve-boks{padding:16px 10px 8px;overflow-x:auto}
+.kurve{min-width:560px;width:100%;height:auto}
+.kurve .akse{font:500 12px var(--tekst);fill:var(--nat-3)}
+.kurve .etiket{font:700 12.5px var(--tekst)}
+.kurve polyline{stroke-dasharray:2400;stroke-dashoffset:2400;animation:tegn 1.6s ease-out forwards}
+@keyframes tegn{to{stroke-dashoffset:0}}
+
+/* Spar-beregner */
+.spar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);gap:0;padding:0;overflow:hidden;margin:20px 0 14px}
+.spar-felter{padding:24px;display:grid;gap:14px}
+.spar label{display:grid;gap:5px;font-weight:700;font-size:.95rem}
+.spar label span{display:flex;align-items:center;gap:8px;font-weight:500;color:var(--nat-2)}
+.spar input{width:130px;font:700 1.15rem var(--tekst);padding:10px 12px;border:2px solid var(--kant);border-radius:12px;color:var(--nat);background:#fff}
+.spar input:focus{border-color:var(--strom);outline:0}
+.spar-res{background:var(--nat);color:#fff;padding:24px;display:flex;flex-direction:column;gap:6px;justify-content:center}
+.spar-res > span{color:#C6CFEE;font-size:.95rem}
+.spar-res b{font:800 clamp(2.2rem,5vw,3.2rem)/1 var(--display);letter-spacing:-.03em;color:var(--sol)}
+.spar-res .knap{margin-top:10px}
+@media (max-width:760px){.spar{grid-template-columns:1fr}.spar input{width:110px}}
+@media (max-width:520px){.hero-knapper .knap{width:100%;white-space:normal}.baand .knap,.vkort .knap{white-space:normal}}
+@media (max-width:520px){.knap{white-space:normal;text-align:center}}
+details.toc{margin-bottom:22px}
+details.toc summary{cursor:pointer;font-weight:700;font-size:.95rem;list-style:none;display:inline-flex;gap:8px;align-items:center;padding:6px 0}
+details.toc summary::-webkit-details-marker{display:none}
+details.toc summary::after{content:"+";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;background:var(--plade);font-weight:800}
+details.toc[open] summary::after{content:"–"}
+details.toc .toc-linje{margin:8px 0 0}
+@media (max-width:820px){table.stak caption{display:block;width:100%}}
+@media (max-width:820px){table.stak td.cta::before{display:none}}
