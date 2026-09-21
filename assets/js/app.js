@@ -46,6 +46,15 @@
     return data.map(function (s) { var b = billigst(s, kwh); return { s: s, p: b.p, aar: b.aar }; })
       .sort(function (a, b) { return a.aar - b.aar || a.s.navn.localeCompare(b.s.navn, 'da'); });
   }
+  // Brugerens nuværende aftale huskes lokalt i browseren (ingen cookies, intet sendes videre)
+  var mit = null; try { mit = JSON.parse(localStorage.getItem('mit-el')); } catch (e) {}
+  var gemMit = function () { try { localStorage.setItem('mit-el', JSON.stringify(mit)); } catch (e) {} };
+  var erMin = function (x) { return mit && mit.slug === x.s.slug; };
+  var knapTekst = function (x, kwh) {
+    if (!mit || mit.t == null || erMin(x)) return 'Se aftalen';
+    var spar = mit.t * kwh / 100 + mit.a * 12 - x.aar;
+    return spar >= 50 ? 'Spar ' + kr(spar) : 'Se aftalen';
+  };
   var ber = $('#beregner');
   if (ber && data.length) {
     var slider = $('#forbrug'), tal = $('#forbrug-tal'), ul = $('#resultat'), spar = $('#spar-tekst');
@@ -55,17 +64,19 @@
       tal.textContent = kwh.toLocaleString('da-DK');
       slider.setAttribute('aria-valuetext', kwh + ' kWh om året');
       ul.innerHTML = r.map(function (x, i) {
-        return '<li><span class="nr">' + (i + 1) + '</span>' +
-          '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' +
-          '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a><small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(x.p.abo, 2) + ' kr./md.</small></span>' +
+        return '<li' + (erMin(x) ? ' class="min"' : '') + '><span class="nr">' + (i + 1) + '</span>' +
+          (x.s.logo ? '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' : '<span class="tekstlogo">' + x.s.navn + '</span>') +
+          '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a>' + (erMin(x) ? ' <span class="maerke gul">Din aftale i dag</span>' : '') + '<small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(x.p.abo, 2) + ' kr./md.</small></span>' +
           '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span>' +
-          '<a class="knap" href="' + rod + 'go/' + x.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se aftalen hos ' + x.s.navn + ' (reklamelink)">Se aftalen</a></li>';
+          '<a class="knap" href="' + rod + 'go/' + x.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se aftalen hos ' + x.s.navn + ' (reklamelink)">' + knapTekst(x, kwh) + '</a></li>';
       }).join('');
       var forskel = r[r.length - 1].aar - r[0].aar;
       if (spar) spar.innerHTML = 'Ved <b>' + kwh.toLocaleString('da-DK') + ' kWh</b> er der <b>' + kr(forskel) + '</b> om året til forskel på den billigste og den dyreste aftale i vores sammenligning.';
       $$('.typer button', ber).forEach(function (b) { b.setAttribute('aria-pressed', (+b.dataset.kwh === kwh) ? 'true' : 'false'); });
     };
-    slider.addEventListener('input', tegn);
+    if (mit && mit.kwh) slider.value = Math.min(15000, Math.max(1000, mit.kwh));
+    slider.addEventListener('input', function () { mit = mit || {}; mit.kwh = +slider.value; gemMit(); var f = $('#sp-kwh'); if (f) { f.value = slider.value; f.dispatchEvent(new Event('input')); } else tegn(); });
+    document.addEventListener('mit-el', tegn);
     $$('.typer button', ber).forEach(function (b) { b.addEventListener('click', function () { slider.value = b.dataset.kwh; tegn(); }); });
     tegn();
   }
@@ -92,20 +103,33 @@
   });
 
   /* ---------- Spar-beregner ---------- */
-  var spar = $('#sparberegner');
-  if (spar && data.length) {
-    var fk = $('#sp-kwh'), ft = $('#sp-til'), fa = $('#sp-abo'), ud = $('#sp-tal'), tx = $('#sp-tekst'), kn = $('#sp-knap'), srod = spar.getAttribute('data-rod') || '', vist = 0, raf;
+  var sparBoks = $('#sparberegner');
+  if (sparBoks && data.length) {
+    var fk = $('#sp-kwh'), ft = $('#sp-til'), fa = $('#sp-abo'), ud = $('#sp-tal'), tx = $('#sp-tekst'), kn = $('#sp-knap'), srod = sparBoks.getAttribute('data-rod') || '', vist = 0, raf;
     var taelOp = function (til) {
       cancelAnimationFrame(raf); var fra = vist, t0 = null;
       var trin = function (t) { if (!t0) t0 = t; var f = Math.min(1, (t - t0) / 500); vist = fra + (til - fra) * (1 - Math.pow(1 - f, 3)); ud.textContent = kr(vist) ; if (f < 1) raf = requestAnimationFrame(trin); };
       raf = requestAnimationFrame(trin);
     };
     var regn = function () {
+      var s0 = $('#sp-selskab');
+      if (s0 && !s0.value) { cancelAnimationFrame(raf); vist = 0; ud.textContent = '? kr.'; tx.textContent = 'Vælg dit nuværende elselskab, så regner vi resten ud.'; kn.style.display = 'none'; return; }
       var kwh = Math.max(0, +fk.value || 0), nu = (+ft.value || 0) * kwh / 100 + (+fa.value || 0) * 12, b = rangliste(kwh)[0], forskel = nu - b.aar;
       if (forskel > 0) { taelOp(forskel); tx.innerHTML = 'om året ved at skifte til <b style="font:inherit;color:#fff;font-weight:700">' + b.s.navn + '</b>. Du betaler ' + kr(nu) + ' til dit elselskab i dag. Hos ' + b.s.navn + ' ville det være ' + kr(b.aar); kn.style.display = ''; kn.textContent = 'Gå til ' + b.s.navn; kn.href = srod + 'go/' + b.s.slug + '/'; }
       else { cancelAnimationFrame(raf); vist = 0; ud.textContent = '0 kr.'; tx.textContent = 'Din aftale er allerede billigere end alle i vores sammenligning. Bliv, hvor du er.'; kn.style.display = 'none'; }
     };
-    [fk, ft, fa].forEach(function (f) { f.addEventListener('input', regn); }); regn();
+    var sel = $('#sp-selskab'), man = [ft.closest('label'), fa.closest('label')];
+    var visMan = function (v) { man.forEach(function (l) { if (l) l.style.display = v ? '' : 'none'; }); };
+    if (mit) { if (mit.kwh) fk.value = mit.kwh; if (mit.valg && sel) sel.value = mit.valg; if (mit.t != null) { ft.value = mit.t; fa.value = mit.a; } }
+    visMan(!sel || sel.value === 'andet');
+    if (sel) sel.addEventListener('change', function () {
+      var o = sel.options[sel.selectedIndex]; mit = mit || {};
+      if (o.dataset.t != null && o.dataset.t !== '') { ft.value = o.dataset.t; fa.value = o.dataset.a; mit.slug = sel.value.split('|')[0]; visMan(false); }
+      else { mit.slug = null; visMan(sel.value === 'andet'); }
+      mit.valg = sel.value; regn();
+    });
+    var regnOgGem = function () { regn(); mit = mit || {}; mit.kwh = +fk.value || 0; if (sel && sel.value) { mit.t = +ft.value || 0; mit.a = +fa.value || 0; } else { mit.t = null; } gemMit(); var sl = $('#forbrug'); if (sl && +sl.value !== mit.kwh && mit.kwh >= 1000) { sl.value = Math.min(15000, mit.kwh); } document.dispatchEvent(new Event('mit-el')); };
+    [fk, ft, fa].forEach(function (f) { f.addEventListener('input', regnOgGem); }); if (sel) sel.addEventListener('change', regnOgGem); regn();
   }
 
   /* ---------- Live elpriser ---------- */

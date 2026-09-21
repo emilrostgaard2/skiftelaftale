@@ -497,3 +497,17 @@ table.timetabel td,table.timetabel th{padding:9px 14px}
 table.apparater td.nu b{font-family:var(--display);font-size:1.02rem}
 table.apparater td.lav{color:#0A6B3D;font-weight:600}
 @media (max-width:1000px){.menu a{padding:9px 9px;font-size:.93rem}}
+
+/* ===== v5 ===== */
+.tekstlogo{display:inline-block;font:800 .95rem/1.1 var(--display);letter-spacing:-.02em;color:var(--nat);background:var(--plade);border:1px solid var(--kant);border-radius:9px;padding:7px 9px;max-width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.anm-logo .tekstlogo{font-size:1.5rem;max-width:none;border:0;background:transparent;padding:0}
+.vkort .tekstlogo,.s-kort .tekstlogo{font-size:1.15rem;max-width:none}
+.spar select{width:100%;max-width:340px;font:700 1.02rem var(--tekst);padding:11px 12px;border:2px solid var(--kant);border-radius:12px;color:var(--nat);background:#fff}
+.spar select:focus{border-color:var(--strom);outline:0}
+.spar label span{flex-wrap:wrap}
+.resultat li.min{border:2px dashed var(--sol);background:var(--sol-lys)}
+.resultat .navn .maerke{vertical-align:2px;margin-left:4px}
+.alle-liste{list-style:none;padding:0;margin:18px 0;columns:4 180px;column-gap:24px;font-size:.97rem}
+.alle-liste li{margin:0 0 7px;break-inside:avoid;color:var(--nat-2)}
+.alle-liste a{color:var(--nat)}
+@media (max-width:1000px){.menu a{padding:9px 8px;font-size:.92rem}}
