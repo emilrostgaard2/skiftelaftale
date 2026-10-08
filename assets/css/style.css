@@ -511,3 +511,19 @@ table.apparater td.lav{color:#0A6B3D;font-weight:600}
 .alle-liste li{margin:0 0 7px;break-inside:avoid;color:var(--nat-2)}
 .alle-liste a{color:var(--nat)}
 @media (max-width:1000px){.menu a{padding:9px 8px;font-size:.92rem}}
+
+/* ---- v12 ---- */
+.live-top{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between}
+.live-top .omraade{flex-wrap:wrap}
+.fod-h{font-family:inherit;font-size:1rem;font-weight:700;color:#fff;margin:0 0 12px}
+.baand-h{margin:0 0 6px!important;color:#fff!important;font-family:var(--display);font-weight:700;font-size:clamp(1.4rem,2.6vw,1.9rem);line-height:1.2}
+.prosa h2.lille-h,h2.lille-h{font-size:1.15rem;border-top:0;padding-top:0;margin:32px 0 10px}
+.kortsvar{margin-top:0}
+.kortsvar p{font-size:1.04rem;line-height:1.6}
+a.tp{color:inherit;text-decoration:none;white-space:nowrap}
+a.tp:hover b{text-decoration:underline}
+.om-top{display:grid;grid-template-columns:200px minmax(0,1fr);gap:26px;align-items:center}
+@media (max-width:600px){.om-top{grid-template-columns:1fr}.om-top svg{max-width:180px}}
+.om-person{display:grid;grid-template-columns:140px minmax(0,1fr);gap:20px;align-items:start}
+.om-person .foto{border-radius:50%}
+@media (max-width:520px){.om-person{grid-template-columns:1fr}}

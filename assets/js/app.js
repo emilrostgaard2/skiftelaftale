@@ -34,10 +34,15 @@
 
   /* ---------- Beregner ---------- */
   var data = window.SELSKABER || [];
+  // Abonnement kan have trin efter forbrug, fx 18 kr. op til 5.000 kWh og 38 kr. derover
+  function aboVed(p, kwh) {
+    if (p.trin) for (var i = 0; i < p.trin.length; i++) { if (p.trin[i][0] == null || kwh <= p.trin[i][0]) return p.trin[i][1]; }
+    return p.abo;
+  }
   function billigst(s, kwh) {
     var bedst = null;
     s.produkter.forEach(function (p) {
-      var aar = p.tillaeg * kwh / 100 + p.abo * 12;
+      var aar = p.tillaeg * kwh / 100 + aboVed(p, kwh) * 12;
       if (!bedst || aar < bedst.aar) bedst = { p: p, aar: aar };
     });
     return bedst;
@@ -65,8 +70,8 @@
       slider.setAttribute('aria-valuetext', kwh + ' kWh om året');
       ul.innerHTML = r.map(function (x, i) {
         return '<li' + (erMin(x) ? ' class="min"' : '') + '><span class="nr">' + (i + 1) + '</span>' +
-          (x.s.logo ? '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' : '<span class="tekstlogo">' + x.s.navn + '</span>') +
-          '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a>' + (erMin(x) ? ' <span class="maerke gul">Din aftale i dag</span>' : '') + '<small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(x.p.abo, 2) + ' kr./md.</small></span>' +
+          (x.s.logo ? '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' : '<span class="tekstlogo" aria-hidden="true">' + x.s.navn + '</span>') +
+          '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a>' + (erMin(x) ? ' <span class="maerke gul">Din aftale i dag</span>' : '') + '<small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(aboVed(x.p, kwh), 2) + ' kr./md.</small></span>' +
           '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span>' +
           '<a class="knap" href="' + rod + 'go/' + x.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se aftalen hos ' + x.s.navn + ' (reklamelink)">' + knapTekst(x, kwh) + '</a></li>';
       }).join('');
@@ -185,7 +190,7 @@
       });
       return Object.keys(m).sort().map(function (k) { return { t: m[k].t, ore: m[k].sum / m[k].n * 100 * 1.25 }; });
     }
-    var visDag = 'idag', sidste = null;
+    var visDag = live.getAttribute('data-start') === 'imorgen' ? 'imorgen' : 'idag', sidste = null;
     function vis(res) {
       sidste = res;
       var timer = tilTimer(res.raekker), nu = new Date(), idag = dagStr(nu);
@@ -257,11 +262,14 @@
       
       saet('#hentet', 'kl. ' + pad(nu.getHours()) + '.' + pad(nu.getMinutes()));
       saet('#kilde', res.kilde);
+      $$('[data-snap="snap-tekst"]').forEach(function (x) { x.textContent = ''; });
       live.classList.add('klar');
     }
     var sidsteFejl = '';
     function fejl() {
       var graf = $('#graf');
+      var harSnap = ($('#pris-nu') || {}).textContent && $('#pris-nu').textContent !== '–';
+      if (harSnap) return; // statisk øjebliksbillede fra seneste udgivelse bliver stående
       if (graf && graf.hasAttribute('hidden')) { var sek = live.closest('section'); if (sek) sek.hidden = true; return; }
       if (graf) graf.innerHTML = '<p class="graf-fejl">Vi kan ikke hente dagens priser lige nu. Prøv at genindlæse siden om lidt – eller se priserne direkte hos <a href="https://www.energidataservice.dk/" rel="noopener">Energi Data Service</a>.<br><small style="opacity:.7">Teknisk: ' + sidsteFejl + '</small></p>';
     }

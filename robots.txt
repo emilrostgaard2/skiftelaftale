@@ -1,4 +1,66 @@
 User-agent: *
+Allow: /
 Disallow: /go/
+Disallow: /tools/
+
+User-agent: GPTBot
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: Claude-User
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: Bingbot
+Allow: /
+Disallow: /go/
+Disallow: /tools/
+
+User-agent: CCBot
+Allow: /
+Disallow: /go/
+Disallow: /tools/
 
 Sitemap: https://skiftelaftale.dk/sitemap.xml
