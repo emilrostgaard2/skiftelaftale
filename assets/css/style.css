@@ -701,3 +701,6 @@ figure.bil img{border-radius:12px;box-shadow:none}
 .forklaring span:nth-child(1) i{background:var(--strom)!important}
 .forklaring span:nth-child(2) i{background:#CBD5E1!important}
 .forklaring span:nth-child(4) i{outline-color:var(--nat)!important}
+small.gebyr,small.intro1{display:block;font-weight:400;font-size:.76rem;color:var(--nat-3);white-space:nowrap}
+small.intro1{color:var(--strom-dyb);font-weight:600}
+.prosa .tabel-rul table th,.prosa .tabel-rul table td{padding:11px 12px}

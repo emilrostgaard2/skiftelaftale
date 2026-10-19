@@ -42,7 +42,7 @@
   function billigst(s, kwh) {
     var bedst = null;
     s.produkter.forEach(function (p) {
-      var aar = p.tillaeg * kwh / 100 + aboVed(p, kwh) * 12;
+      var aar = p.tillaeg * kwh / 100 + aboVed(p, kwh) * 12 + (p.gebyr || 0) + (p.gebyr_kwh || 0) * kwh / 100;
       if (!bedst || aar < bedst.aar) bedst = { p: p, aar: aar };
     });
     return bedst;
