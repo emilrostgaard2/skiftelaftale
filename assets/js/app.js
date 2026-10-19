@@ -87,6 +87,14 @@
   }
 
 
+  /* ---------- Husstandsvalg til top 3 ---------- */
+  $$('.husvalg').forEach(function (g) {
+    var kn = $$('button', g);
+    kn.forEach(function (b) { b.addEventListener('click', function () {
+      kn.forEach(function (x) { var on = x === b; x.setAttribute('aria-pressed', on ? 'true' : 'false'); var p = document.getElementById(x.dataset.panel); if (p) p.hidden = !on; });
+    }); });
+  });
+
   /* ---------- Indholdsliste: lukket på mobil ---------- */
   if (window.innerWidth < 820) $$('details.toc').forEach(function (d) { d.removeAttribute('open'); });
 
