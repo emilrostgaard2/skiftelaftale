@@ -64,12 +64,15 @@
   if (ber && data.length) {
     var slider = $('#forbrug'), tal = $('#forbrug-tal'), ul = $('#resultat'), spar = $('#spar-tekst');
     var rod = ber.getAttribute('data-rod') || '';
+    var sortMode = 'partner';
     var tegn = function () {
-      var kwh = +slider.value, r = rangliste(kwh);
+      var kwh = +slider.value, rp = rangliste(kwh);
+      var r = sortMode === 'pris' ? rp : rp.filter(function (x) { return x.s.partner; }).concat(rp.filter(function (x) { return !x.s.partner; }));
+      var forsteIkke = sortMode === 'pris' ? -1 : r.findIndex(function (x) { return !x.s.partner; });
       tal.textContent = kwh.toLocaleString('da-DK');
       slider.setAttribute('aria-valuetext', kwh + ' kWh om året');
       ul.innerHTML = r.map(function (x, i) {
-        return '<li' + (erMin(x) ? ' class="min"' : '') + '><span class="nr">' + (i + 1) + '</span>' +
+        return (i === forsteIkke ? '<li class="skille">Øvrige selskaber, som vi ikke samarbejder med</li>' : '') + '<li' + (erMin(x) ? ' class="min"' : '') + '><span class="nr">' + (i + 1) + '</span>' +
           (x.s.logo ? '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' : '<span class="tekstlogo" aria-hidden="true">' + x.s.navn + '</span>') +
           '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a>' + (erMin(x) ? ' <span class="maerke gul">Din aftale i dag</span>' : '') + '<small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(aboVed(x.p, kwh), 2) + ' kr./md.</small></span>' +
           '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span>' +
@@ -77,13 +80,15 @@
             ? '<span class="rcta"><a class="knap neutral" href="' + x.s.web + '" rel="nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se hos selskabet: ' + x.s.navn + '">Se hos selskabet</a></span></li>'
             : '<span class="rcta"><a class="knap" href="' + rod + 'go/' + x.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se aftalen hos ' + x.s.navn + ' (reklamelink)">' + knapTekst(x, kwh) + '</a><span class="annonce">Reklamelink</span></span></li>');
       }).join('');
-      var forskel = r[r.length - 1].aar - r[0].aar;
+      var forskel = rp[rp.length - 1].aar - rp[0].aar;
       if (spar) spar.innerHTML = 'Ved <b>' + kwh.toLocaleString('da-DK') + ' kWh</b> er der <b>' + kr(forskel) + '</b> om året til forskel på den billigste og den dyreste aftale i vores sammenligning.';
       $$('.typer button', ber).forEach(function (b) { b.setAttribute('aria-pressed', (+b.dataset.kwh === kwh) ? 'true' : 'false'); });
     };
     if (mit && mit.kwh) slider.value = Math.min(15000, Math.max(1000, mit.kwh));
-    slider.addEventListener('input', function () { mit = mit || {}; mit.kwh = +slider.value; gemMit(); var f = $('#sp-kwh'); if (f) { f.value = slider.value; f.dispatchEvent(new Event('input')); } else tegn(); });
-    document.addEventListener('mit-el', tegn);
+    slider.addEventListener('input', function () { mit = mit || {}; mit.kwh = +slider.value; gemMit(); tegn(); });
+    document.addEventListener('mit-el', function () { if (mit && mit.kwh) slider.value = Math.min(15000, Math.max(1000, mit.kwh)); tegn(); });
+    $$('.sortvalg button', ber).forEach(function (b) { b.addEventListener('click', function () {
+      sortMode = b.dataset.sort; ber.classList.toggle('pris', sortMode === 'pris'); $$('.sortvalg button', ber).forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); tegn(); }); });
     $$('.typer button', ber).forEach(function (b) { b.addEventListener('click', function () { slider.value = b.dataset.kwh; tegn(); }); });
     tegn();
   }
@@ -99,6 +104,22 @@
 
   /* ---------- Indholdsliste: lukket på mobil ---------- */
   if (window.innerWidth < 820) $$('details.toc').forEach(function (d) { d.removeAttribute('open'); });
+
+  /* ---------- Sortering på rangtabeller: partnere først eller kun pris ---------- */
+  $$('.rang-blok').forEach(function (blok) {
+    var kn = $$('.sortvalg button', blok), tb = $('tbody', blok); if (!kn.length || !tb) return;
+    var rows = $$('tr[data-pris]', tb), skil = $('tr.skille:not(.partnere)', tb), phd = $('tr.skille.partnere', tb), orig = rows.slice();
+    var minR = rows.reduce(function (m, r) { return !m || +r.dataset.pris < +m.dataset.pris ? r : m; }, null);
+    kn.forEach(function (b) { b.addEventListener('click', function () {
+      kn.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      var liste = b.dataset.sort === 'pris' ? rows.slice().sort(function (a, c) { return +a.dataset.pris - +c.dataset.pris; }) : orig;
+      liste.forEach(function (r, i) { if (skil && b.dataset.sort !== 'pris' && r.dataset.partner === '0' && (i === 0 || liste[i - 1].dataset.partner === '1')) tb.appendChild(skil); tb.appendChild(r); var nr = $('.nr', r); if (nr) nr.textContent = i + 1; r.classList.toggle('vinder', r === minR); });
+      if (skil) skil.hidden = b.dataset.sort === 'pris';
+      if (phd) { phd.hidden = b.dataset.sort === 'pris'; tb.insertBefore(phd, tb.firstChild); }
+      blok.classList.toggle('pris', b.dataset.sort === 'pris');
+      var mn = $('.mnote', blok); if (mn) mn.hidden = b.dataset.sort === 'pris';
+    }); });
+  });
 
   /* ---------- Filtre på rangtabeller ---------- */
   $$('.rang-blok').forEach(function (blok) {
@@ -117,44 +138,52 @@
     }); });
   });
 
-  /* ---------- Spar-beregner ---------- */
-  var sparBoks = $('#sparberegner');
-  if (sparBoks && data.length) {
-    var fk = $('#sp-kwh'), ft = $('#sp-til'), fa = $('#sp-abo'), ud = $('#sp-tal'), tx = $('#sp-tekst'), kn = $('#sp-knap'), srod = sparBoks.getAttribute('data-rod') || '', vist = 0, raf;
-    var taelOp = function (til) {
-      cancelAnimationFrame(raf); var fra = vist, t0 = null;
-      var trin = function (t) { if (!t0) t0 = t; var f = Math.min(1, (t - t0) / 500); vist = fra + (til - fra) * (1 - Math.pow(1 - f, 3)); ud.textContent = kr(vist) ; if (f < 1) raf = requestAnimationFrame(trin); };
-      raf = requestAnimationFrame(trin);
+  /* ---------- Guide: 3 trin til besparelse ---------- */
+  var gd = $('#sparberegner');
+  if (gd && data.length && $('#g-res')) {
+    var grod = gd.getAttribute('data-rod') || '', gsel = $('#g-selskab'), gkwh = $('#g-kwh'), gres = $('#g-res'), gandet = $('#g-andet');
+    var gKwh = (mit && mit.kwh) || 4000;
+    var logo = function (s) { return s.logo ? '<img src="' + grod + 'assets/img/logos/' + s.logo + '" alt="' + s.navn + ' logo" width="88" height="30">' : '<span class="tekstlogo" aria-hidden="true">' + s.navn + '</span>'; };
+    var goLink = function (s, tekst, kl, pos) { return '<a class="' + kl + '" href="' + grod + 'go/' + s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="' + pos + '">' + tekst + '</a>'; };
+    var raekke = function (x, kwh, din) {
+      return '<li' + (din ? ' class="din"' : '') + '>' + logo(x.s) + '<span class="g2-n">' + x.s.navn + (din ? ' (din nuværende)' : '') + '</span><b class="g2-p tal">' + kr(x.aar) + '</b>' +
+        (din ? '<span class="g2-din">Din aftale</span>' : '<span class="g2-k">' + goLink(x.s, 'Se aftale', 'knap lille lys', 'guide-liste') + '<span class="annonce">Reklamelink</span></span>') + '</li>';
     };
-    var regn = function () {
-      var s0 = $('#sp-selskab');
-      if (s0 && !s0.value) { cancelAnimationFrame(raf); vist = 0; ud.textContent = '? kr.'; tx.textContent = 'Vælg dit nuværende elselskab, så regner vi resten ud.'; kn.style.display = 'none'; var a0 = $('#sp-ann'); if (a0) a0.hidden = true; var p0 = $('#sp-partner'); if (p0) p0.hidden = true; return; }
-      var kwh = Math.max(0, +fk.value || 0), nu = (+ft.value || 0) * kwh / 100 + (+fa.value || 0) * 12, b = rangliste(kwh)[0], forskel = nu - b.aar;
-      var spA = $('#sp-ann'), spP = $('#sp-partner');
-      var bp = rangliste(kwh).filter(function (x) { return x.s.partner; })[0];
-      if (spA) spA.hidden = !(forskel > 0 && b.s.partner);
-      if (spP) {
-        var nuSlug = (sel && sel.value) ? sel.value.split('|')[0] : '';
-        if (forskel > 0 && bp && !b.s.partner && bp.s.slug !== nuSlug && nu - bp.aar > 0) {
-          spP.hidden = false;
-          spP.innerHTML = '<p>Billigste samarbejdspartner: <b>' + bp.s.navn + '</b>, ' + kr(bp.aar) + ' om året (spar ' + kr(nu - bp.aar) + '). Gratis at skifte.</p><a class="knap sol" href="' + srod + 'go/' + bp.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="spar-partner">Gå til ' + bp.s.navn + '</a><span class="annonce">Reklamelink</span>';
-        } else { spP.hidden = true; spP.innerHTML = ''; }
+    var gRegn = function () {
+      var kwh = Math.max(500, +gKwh || 4000), rp = rangliste(kwh), par = rp.filter(function (x) { return x.s.partner; }), b0 = rp[0];
+      var v = gsel.value, nu = null, nuNavn = '', mig = null;
+      if (v === 'andet') { nu = (+$('#g-til').value || 0) * kwh / 100 + (+$('#g-abo').value || 0) * 12; nuNavn = 'dit nuværende selskab'; }
+      else if (v) { mig = rp.filter(function (x) { return x.s.slug === v; })[0]; if (mig) { nu = mig.aar; nuNavn = mig.s.navn; } }
+      var andre = par.filter(function (x) { return x.s.slug !== v; }), bp = andre[0], kwhT = kwh.toLocaleString('da-DK');
+      var spar = (nu !== null && bp) ? nu - bp.aar : null, h = '';
+      if (spar !== null && spar >= 25) {
+        h += '<div class="g2-boks"><div class="g2-tekst"><span class="g2-over">Du kan spare ca.</span><b class="g2-stor">' + kr(spar) + ' om året</b><span class="g2-under">ved at skifte fra ' + nuNavn + ' til ' + bp.s.navn + ' (' + kwhT + ' kWh)</span></div>' +
+          '<div class="g2-cta">' + goLink(bp.s, 'Skift til ' + bp.s.navn + ' →', 'knap hvid', 'guide') + '<span class="annonce">Reklamelink · Gratis at skifte</span></div></div>';
+      } else if (spar !== null) {
+        h += '<div class="g2-boks g2-ok"><div class="g2-tekst"><span class="g2-over">Godt valg</span><b class="g2-stor">Din aftale er blandt de billigste</b><span class="g2-under">Du betaler ca. ' + kr(nu) + ' om året til ' + nuNavn + ' ved ' + kwhT + ' kWh. Det betaler sig næppe at skifte.</span></div></div>';
+      } else if (bp) {
+        h += '<div class="g2-boks"><div class="g2-tekst"><span class="g2-over">Billigste aftale via os ved ' + kwhT + ' kWh</span><b class="g2-stor">' + kr(bp.aar) + ' om året</b><span class="g2-under">hos ' + bp.s.navn + ' · ' + bp.p.navn + '</span></div>' +
+          '<div class="g2-cta">' + goLink(bp.s, 'Skift til ' + bp.s.navn + ' →', 'knap hvid', 'guide') + '<span class="annonce">Reklamelink · Gratis at skifte</span></div></div>';
       }
-      if (forskel > 0) { taelOp(forskel); tx.innerHTML = 'om året ved at skifte til <b style="font:inherit;color:#fff;font-weight:700">' + b.s.navn + '</b>. Du betaler ' + kr(nu) + ' til dit elselskab i dag. Hos ' + b.s.navn + ' ville det være ' + kr(b.aar); kn.style.display = ''; kn.textContent = 'Gå til ' + b.s.navn; kn.classList.toggle('neutral', b.s.partner === false); if (b.s.partner === false) { kn.href = b.s.web; kn.rel = 'nofollow noopener'; kn.textContent = 'Se ' + b.s.navn; } else { kn.href = srod + 'go/' + b.s.slug + '/'; kn.rel = 'sponsored nofollow noopener'; } }
-      else { cancelAnimationFrame(raf); vist = 0; ud.textContent = '0 kr.'; tx.textContent = 'Din aftale er allerede billigere end alle i vores sammenligning. Bliv, hvor du er.'; kn.style.display = 'none'; }
+      var liste = andre.slice(spar !== null && spar < 25 ? 0 : 1, (spar !== null && spar < 25 ? 0 : 1) + (mig || nu !== null ? 1 : 2)).map(function (x) { return raekke(x, kwh); }).join('');
+      if (mig) liste += raekke(mig, kwh, true);
+      else if (nu !== null) liste += '<li class="din"><span class="tekstlogo" aria-hidden="true">Din aftale</span><span class="g2-n">Dit nuværende selskab</span><b class="g2-p tal">' + kr(nu) + '</b><span class="g2-din">Din aftale</span></li>';
+      h += '<p class="g2-h">' + (spar !== null && spar < 25 ? 'Billigste aftaler via os' : 'Andre gode aftaler') + '</p><ul class="g2-liste">' + liste + '</ul>';
+      if (!b0.s.partner && b0.s.slug !== v && (nu === null || nu - b0.aar >= 25)) h += '<p class="mnote">Billigst i hele markedet ved ' + kwhT + ' kWh er <a href="' + grod + 'elselskaber/' + b0.s.slug + '/">' + b0.s.navn + '</a> med ' + kr(b0.aar) + ' om året. Vi samarbejder ikke med ' + b0.s.navn + ', så selskabet står under vores partnere.</p>';
+      h += '<p class="g2-fod">Pris pr. år til elselskabet ved ' + kwhT + ' kWh, inkl. moms og gebyrer. Selve strømmen, nettarif og afgifter kommer oveni og er ens for alle. <a href="' + ($('#beregner') ? '#beregner' : grod + 'billigste-elselskab/') + '">Se alle ' + rp.length + ' selskaber</a></p>';
+      gres.innerHTML = h;
+      $$('.g-hus button', gd).forEach(function (b) { b.setAttribute('aria-pressed', +b.dataset.kwh === kwh ? 'true' : 'false'); });
+      mit = mit || {}; mit.kwh = kwh; mit.gslug = v; gemMit(); document.dispatchEvent(new Event('mit-el'));
     };
-    var sel = $('#sp-selskab'), man = [ft.closest('label'), fa.closest('label')];
-    var visMan = function (v) { man.forEach(function (l) { if (l) l.style.display = v ? '' : 'none'; }); };
-    if (mit) { if (mit.kwh) fk.value = mit.kwh; if (mit.valg && sel) sel.value = mit.valg; if (mit.t != null) { ft.value = mit.t; fa.value = mit.a; } }
-    visMan(!sel || sel.value === 'andet');
-    if (sel) sel.addEventListener('change', function () {
-      var o = sel.options[sel.selectedIndex]; mit = mit || {};
-      if (o.dataset.t != null && o.dataset.t !== '') { ft.value = o.dataset.t; fa.value = o.dataset.a; mit.slug = sel.value.split('|')[0]; visMan(false); }
-      else { mit.slug = null; visMan(sel.value === 'andet'); }
-      mit.valg = sel.value; regn();
-    });
-    var regnOgGem = function () { regn(); mit = mit || {}; mit.kwh = +fk.value || 0; if (sel && sel.value) { mit.t = +ft.value || 0; mit.a = +fa.value || 0; } else { mit.t = null; } gemMit(); var sl = $('#forbrug'); if (sl && +sl.value !== mit.kwh && mit.kwh >= 1000) { sl.value = Math.min(15000, mit.kwh); } document.dispatchEvent(new Event('mit-el')); };
-    [fk, ft, fa].forEach(function (f) { f.addEventListener('input', regnOgGem); }); if (sel) sel.addEventListener('change', regnOgGem); regn();
+    if (mit && mit.gslug && gsel.querySelector('option[value="' + mit.gslug + '"]')) gsel.value = mit.gslug;
+    var fra = (location.search.match(/[?&]fra=([a-z0-9-]+)/) || [])[1];
+    if (fra && gsel.querySelector('option[value="' + fra + '"]')) { gsel.value = fra; setTimeout(gRegn, 0); }
+    gandet.hidden = gsel.value !== 'andet'; if (gkwh) gkwh.value = gKwh;
+    gsel.addEventListener('change', function () { gandet.hidden = gsel.value !== 'andet'; gRegn(); });
+    $$('#g-til, #g-abo', gd).forEach(function (f) { f.addEventListener('input', gRegn); });
+    $$('.g-hus button', gd).forEach(function (b) { b.addEventListener('click', function () { gKwh = +b.dataset.kwh; if (gkwh) gkwh.value = gKwh; gRegn(); }); });
+    if (gkwh) gkwh.addEventListener('input', function () { gKwh = +gkwh.value; gRegn(); });
+    if (mit && (mit.gslug || mit.kwh)) gRegn();
   }
 
   /* ---------- Live elpriser ---------- */
@@ -291,7 +320,7 @@
       var harSnap = ($('#pris-nu') || {}).textContent && $('#pris-nu').textContent !== '–';
       if (harSnap) return; // statisk øjebliksbillede fra seneste udgivelse bliver stående
       if (graf && graf.hasAttribute('hidden')) { var sek = live.closest('section'); if (sek) sek.hidden = true; return; }
-      if (graf) graf.innerHTML = '<p class="graf-fejl">Vi kan ikke hente dagens priser lige nu. Prøv at genindlæse siden om lidt – eller se priserne direkte hos <a href="https://www.energidataservice.dk/" rel="noopener">Energi Data Service</a>.<br><small style="opacity:.7">Teknisk: ' + sidsteFejl + '</small></p>';
+      if (graf) graf.innerHTML = '<p class="graf-fejl">Vi kan ikke hente dagens priser lige nu. Prøv at genindlæse siden om lidt – eller se priserne direkte hos <a href="https://www.energidataservice.dk/" rel="noopener">Energi Data Service</a>.</p>';
     }
     function hent() {
       $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.o === omr ? 'true' : 'false'); });
@@ -330,7 +359,11 @@
       if (hentet === o) return; hentet = o;
       var til = new Date(), fra = new Date(til.getTime() - 30 * 864e5);
       var url = 'https://api.energidataservice.dk/dataset/DayAheadPrices?start=' + ds(fra) + 'T00:00&end=' + ds(til) + 'T00:00&filter=' + encodeURIComponent(JSON.stringify({ PriceArea: [o] })) + '&limit=4000';
-      fetch(url).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (j) {
+      var forsog = function (n) {
+        return fetch(url).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .catch(function (e) { if (n <= 0) throw e; return new Promise(function (ok) { setTimeout(ok, 2500); }).then(function () { return forsog(n - 1); }); });
+      };
+      forsog(2).then(function (j) {
         var rk = (j.records || []).map(function (x) { return { t: new Date(x.TimeDK || x.HourDK), o: (x.DayAheadPriceDKK != null ? x.DayAheadPriceDKK : x.SpotPriceDKK) / 10 * 1.25 }; }).filter(function (x) { return !isNaN(x.t) && isFinite(x.o); });
         if (rk.length < 200) throw 0;
         var T = [], U = [], i; for (i = 0; i < 24; i++) T.push([0, 0]); for (i = 0; i < 7; i++) U.push([0, 0]);
@@ -346,7 +379,12 @@
         tegn('#s-timer', tS, function (i) { return 'kl. ' + p2(i); }); tegn('#s-uge', uS, function (i) { return ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'][i]; });
         var dage = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'], bu = uS.indexOf(Math.min.apply(0, uS));
         saet2('#s-tekst', 'De seneste 30 dage i ' + (o === 'DK1' ? 'Vestdanmark' : 'Østdanmark') + ': i gennemsnit var strømmen billigst kl. ' + p2(mi) + '–' + p2((mi + 1) % 24) + ' (' + ore(tS[mi]) + ' øre) og dyrest kl. ' + p2(ma) + '–' + p2((ma + 1) % 24) + ' (' + ore(tS[ma]) + ' øre). Billigste ugedag var ' + dage[bu] + '. Spotpris inkl. moms. Kilde: Energi Data Service (Energinet).');
-      }).catch(function () { hentet = null; var g = $('#s-timer'); if (g) g.innerHTML = '<p class="graf-fejl">Statistikken kan ikke hentes lige nu.</p>'; });
+      }).catch(function () {
+        hentet = null;
+        var harSnap = ($('#s-snit') || {}).textContent && $('#s-snit').textContent.trim() !== '–';
+        if (harSnap) return; // behold øjebliksbilledet fra seneste udgivelse
+        var g = $('#s-timer'); if (g) g.innerHTML = '<p class="graf-fejl">Statistikken kan ikke hentes lige nu. Prøv at genindlæse siden om lidt.</p>';
+      });
     };
     if ('IntersectionObserver' in window) new IntersectionObserver(function (es, io) { if (es[0].isIntersecting) { hentStat(); } }, { rootMargin: '600px' }).observe(st); else hentStat();
     $$('.omraade:not(.dagvalg) button').forEach(function (b) { b.addEventListener('click', function () { setTimeout(hentStat, 50); }); });

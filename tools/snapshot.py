@@ -116,6 +116,16 @@ def main():
             alle = list(T30.values()); bi = min(tS, key=tS.get); dy = max(tS, key=tS.get)
             h = saet(h, "s-snit", ore(sum(alle) / len(alle))); h = saet(h, "s-neg", str(sum(1 for x in alle if x < 0)))
             h = saet(h, "s-billig", f"kl. {pad(bi)}–{pad((bi + 1) % 24)}"); h = saet(h, "s-dyr", f"kl. {pad(dy)}–{pad((dy + 1) % 24)}")
+            uS = {}
+            for (d, tm), x in T30.items():
+                u = datetime.fromisoformat(d).weekday(); uS.setdefault(u, []).append(x)
+            uS = [sum(uS[i]) / len(uS[i]) if uS.get(i) else 0 for i in range(7)]
+            def soejler(v, navne):
+                top = max(v + [1]); lo2, hi2 = min(v), max(v)
+                return "".join(f'<div class="s {niveau(x, lo2, hi2)}" style="height:{max(4, x / top * 100):.1f}%" data-t="{navne(i)}: {ore(x)} øre"></div>' for i, x in enumerate(v))
+            h = saet(h, "s-timer", soejler([tS.get(i, 0) for i in range(24)], lambda i: f"kl. {pad(i)}"))
+            h = saet(h, "s-uge", soejler(uS, lambda i: ["mandag", "tirsdag", "onsdag", "torsdag", "fredag", "lørdag", "søndag"][i]))
+            h = saet(h, "s-tekst", f"De seneste 30 dage i Vestdanmark: i gennemsnit var strømmen billigst kl. {pad(bi)}–{pad((bi + 1) % 24)} og dyrest kl. {pad(dy)}–{pad((dy + 1) % 24)}. Spotpris inkl. moms. Kilde: Energi Data Service (Energinet).")
         open(fil, "w", encoding="utf-8").write(h); n += 1
     # llms.txt
     lf = os.path.join(ROD, "llms.txt")
