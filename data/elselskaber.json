@@ -1,0 +1,764 @@
+{
+ "kilde": "SkiftElaftale.dk",
+ "licens": "CC BY 4.0",
+ "tjekket": "2026-10-22",
+ "note": "Priser inkl. moms. tillaeg_oere = øre/kWh oven i spotpris. abo_kr_md = kr./md. gebyr_kr_aar = faste gebyrer ved billigste betalingsmåde.",
+ "selskaber": [
+  {
+   "navn": "Altid Energi",
+   "slug": "altid-energi",
+   "url": "https://skiftelaftale.dk/elselskaber/altid-energi/",
+   "hjemmeside": "https://altidenergi.dk",
+   "binding_mdr": 0,
+   "betaling": "Forud (aconto, månedlig)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "Strøm til indkøbspris",
+     "tillaeg_oere": 0,
+     "abo_kr_md": 18,
+     "trin": [
+      [
+       5000,
+       18
+      ],
+      [
+       8000,
+       38
+      ],
+      [
+       12000,
+       58
+      ],
+      [
+       20000,
+       98
+      ],
+      [
+       null,
+       127
+      ]
+     ],
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 216,
+     "aarspris_4000": 216,
+     "aarspris_8000": 456
+    }
+   ],
+   "score": 7.9
+  },
+  {
+   "navn": "Enkel Energi",
+   "slug": "enkel-energi",
+   "url": "https://skiftelaftale.dk/elselskaber/enkel-energi/",
+   "hjemmeside": "https://enkelenergi.dk",
+   "binding_mdr": 0,
+   "betaling": "Forud (aconto, kvartalsvis)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "enkel kvartal",
+     "tillaeg_oere": 0,
+     "abo_kr_md": 18,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 216,
+     "aarspris_4000": 216,
+     "aarspris_8000": 216
+    },
+    {
+     "navn": "enkel strøm",
+     "tillaeg_oere": 2,
+     "abo_kr_md": 28,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 376,
+     "aarspris_4000": 416,
+     "aarspris_8000": 496
+    },
+    {
+     "navn": "enkel natur",
+     "tillaeg_oere": 2,
+     "abo_kr_md": 48,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 616,
+     "aarspris_4000": 656,
+     "aarspris_8000": 736
+    }
+   ],
+   "score": 7.8
+  },
+  {
+   "navn": "Gasel",
+   "slug": "gasel",
+   "url": "https://skiftelaftale.dk/elselskaber/gasel/",
+   "hjemmeside": "https://gasel.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud (faktisk forbrug, månedlig)",
+   "gebyr_kr_aar": 48.72,
+   "aftaler": [
+    {
+     "navn": "El til børspris",
+     "tillaeg_oere": 6,
+     "abo_kr_md": 0,
+     "trin": null,
+     "gebyr_kr_aar": 48.72,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 169,
+     "aarspris_4000": 289,
+     "aarspris_8000": 529
+    }
+   ],
+   "score": 8.1
+  },
+  {
+   "navn": "Modstrøm",
+   "slug": "modstroem",
+   "url": "https://skiftelaftale.dk/elselskaber/modstroem/",
+   "hjemmeside": "https://modstroem.dk",
+   "binding_mdr": 0,
+   "betaling": "Forud (aconto, månedlig)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "EnkEL",
+     "tillaeg_oere": 10,
+     "abo_kr_md": 10,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 320,
+     "aarspris_4000": 520,
+     "aarspris_8000": 920
+    }
+   ],
+   "score": 5.2
+  },
+  {
+   "navn": "go'energi",
+   "slug": "go-energi",
+   "url": "https://skiftelaftale.dk/elselskaber/go-energi/",
+   "hjemmeside": "https://go-energi.dk",
+   "binding_mdr": 0,
+   "betaling": "Forud kvartalsvis (go'kvartal) eller bagud månedlig (go'måned)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "go'kvartal energi",
+     "tillaeg_oere": 7.5,
+     "abo_kr_md": 15,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 330,
+     "aarspris_4000": 480,
+     "aarspris_8000": 780
+    },
+    {
+     "navn": "go'måned energi",
+     "tillaeg_oere": 7.5,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 498,
+     "aarspris_4000": 648,
+     "aarspris_8000": 948
+    },
+    {
+     "navn": "go'kvartal vind",
+     "tillaeg_oere": 12.5,
+     "abo_kr_md": 15,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 430,
+     "aarspris_4000": 680,
+     "aarspris_8000": 1180
+    },
+    {
+     "navn": "go'måned vind",
+     "tillaeg_oere": 12.5,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 598,
+     "aarspris_4000": 848,
+     "aarspris_8000": 1348
+    }
+   ],
+   "score": 6.3
+  },
+  {
+   "navn": "Jysk Energi",
+   "slug": "jysk-energi",
+   "url": "https://skiftelaftale.dk/elselskaber/jysk-energi/",
+   "hjemmeside": "https://jyskenergi.dk",
+   "binding_mdr": 0,
+   "betaling": "Kvartal forud med aconto eller måned bagud uden aconto",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "Variabel Strøm, med aconto (kvartal forud)",
+     "tillaeg_oere": 0,
+     "abo_kr_md": 39,
+     "trin": null,
+     "gebyr_kr_aar": 30,
+     "gebyr_oere_kwh": 0.02,
+     "aarspris_2000": 498,
+     "aarspris_4000": 499,
+     "aarspris_8000": 500
+    },
+    {
+     "navn": "Variabel Strøm, uden aconto (måned bagud)",
+     "tillaeg_oere": 0,
+     "abo_kr_md": 49,
+     "trin": null,
+     "gebyr_kr_aar": 90,
+     "gebyr_oere_kwh": 0.02,
+     "aarspris_2000": 678,
+     "aarspris_4000": 679,
+     "aarspris_8000": 680
+    }
+   ],
+   "score": 6.4
+  },
+  {
+   "navn": "AURA",
+   "slug": "aura",
+   "url": "https://skiftelaftale.dk/elselskaber/aura/",
+   "hjemmeside": "https://aura.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud månedlig eller forud kvartalsvis (du vælger)",
+   "gebyr_kr_aar": 90,
+   "aftaler": [
+    {
+     "navn": "AURA FlexEl",
+     "tillaeg_oere": 10,
+     "abo_kr_md": 21,
+     "trin": null,
+     "gebyr_kr_aar": 90,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 542,
+     "aarspris_4000": 742,
+     "aarspris_8000": 1142
+    },
+    {
+     "navn": "AURA POWER",
+     "tillaeg_oere": 0,
+     "abo_kr_md": 49,
+     "trin": null,
+     "gebyr_kr_aar": 90,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 678,
+     "aarspris_4000": 678,
+     "aarspris_8000": 678
+    },
+    {
+     "navn": "AURA Light",
+     "tillaeg_oere": 23,
+     "abo_kr_md": 0,
+     "trin": null,
+     "gebyr_kr_aar": 90,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 550,
+     "aarspris_4000": 1010,
+     "aarspris_8000": 1930
+    }
+   ],
+   "score": 5.6
+  },
+  {
+   "navn": "OK",
+   "slug": "ok",
+   "url": "https://skiftelaftale.dk/elselskaber/ok/",
+   "hjemmeside": "https://www.ok.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud (faktisk forbrug, månedlig)",
+   "gebyr_kr_aar": 66,
+   "aftaler": [
+    {
+     "navn": "OK El Lavt Forbrug",
+     "tillaeg_oere": 19,
+     "abo_kr_md": 0,
+     "trin": null,
+     "gebyr_kr_aar": 66,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 446,
+     "aarspris_4000": 826,
+     "aarspris_8000": 1586
+    },
+    {
+     "navn": "OK El Højt Forbrug",
+     "tillaeg_oere": 0,
+     "abo_kr_md": 49,
+     "trin": null,
+     "gebyr_kr_aar": 66,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 654,
+     "aarspris_4000": 654,
+     "aarspris_8000": 654
+    },
+    {
+     "navn": "OK El Lavt Forbrug + Dansk vindstrøm",
+     "tillaeg_oere": 25,
+     "abo_kr_md": 0,
+     "trin": null,
+     "gebyr_kr_aar": 66,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 566,
+     "aarspris_4000": 1066,
+     "aarspris_8000": 2066
+    },
+    {
+     "navn": "OK El Højt Forbrug + Dansk vindstrøm",
+     "tillaeg_oere": 6,
+     "abo_kr_md": 49,
+     "trin": null,
+     "gebyr_kr_aar": 66,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 774,
+     "aarspris_4000": 894,
+     "aarspris_8000": 1134
+    }
+   ],
+   "score": 6.1
+  },
+  {
+   "navn": "EWII",
+   "slug": "ewii",
+   "url": "https://skiftelaftale.dk/elselskaber/ewii/",
+   "hjemmeside": "https://www.ewii.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud (månedlig)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "Plus El",
+     "tillaeg_oere": 6.5,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 478,
+     "aarspris_4000": 608,
+     "aarspris_8000": 868
+    },
+    {
+     "navn": "Basis El",
+     "tillaeg_oere": 16.5,
+     "abo_kr_md": 0,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 330,
+     "aarspris_4000": 660,
+     "aarspris_8000": 1320
+    },
+    {
+     "navn": "Prisloft El",
+     "tillaeg_oere": 50,
+     "abo_kr_md": 15,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 1180,
+     "aarspris_4000": 2180,
+     "aarspris_8000": 4180
+    }
+   ],
+   "score": 5.7
+  },
+  {
+   "navn": "Norlys",
+   "slug": "norlys",
+   "url": "https://skiftelaftale.dk/elselskaber/norlys/",
+   "hjemmeside": "https://norlys.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud (månedlig)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "FlexEl",
+     "tillaeg_oere": 9.7,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 542,
+     "aarspris_4000": 736,
+     "aarspris_8000": 1124
+    }
+   ],
+   "score": 3.0
+  },
+  {
+   "navn": "Andel Energi",
+   "slug": "andel-energi",
+   "url": "https://skiftelaftale.dk/elselskaber/andel-energi/",
+   "hjemmeside": "https://andelenergi.dk",
+   "binding_mdr": 2,
+   "betaling": "Bagud (månedlig)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "FlexEnergi",
+     "tillaeg_oere": 14.58,
+     "abo_kr_md": 20,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 532,
+     "aarspris_4000": 823,
+     "aarspris_8000": 1406
+    }
+   ],
+   "score": 2.7
+  },
+  {
+   "navn": "NRGi",
+   "slug": "nrgi",
+   "url": "https://skiftelaftale.dk/elselskaber/nrgi/",
+   "hjemmeside": "https://nrgi.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud (forbrugsafregnet månedligt)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "NRGi Time",
+     "tillaeg_oere": 9,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 528,
+     "aarspris_4000": 708,
+     "aarspris_8000": 1068
+    },
+    {
+     "navn": "NRGi Time Klimatilvalg",
+     "tillaeg_oere": 10.61,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 560,
+     "aarspris_4000": 772,
+     "aarspris_8000": 1197
+    }
+   ],
+   "score": 4.3
+  },
+  {
+   "navn": "DCC Energi",
+   "slug": "dcc-energi",
+   "url": "https://skiftelaftale.dk/elselskaber/dcc-energi/",
+   "hjemmeside": "https://www.dccenergi.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud ifølge produktsiden (handelsbetingelserne nævner aconto forud)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "Flex",
+     "tillaeg_oere": 8.24,
+     "abo_kr_md": 25,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 465,
+     "aarspris_4000": 630,
+     "aarspris_8000": 959
+    },
+    {
+     "navn": "Flex VE (vedvarende energi)",
+     "tillaeg_oere": 11.74,
+     "abo_kr_md": 25,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 535,
+     "aarspris_4000": 770,
+     "aarspris_8000": 1239
+    }
+   ],
+   "score": 4.6
+  },
+  {
+   "navn": "Verdo",
+   "slug": "verdo",
+   "url": "https://skiftelaftale.dk/elselskaber/verdo/",
+   "hjemmeside": "https://el.verdo.com",
+   "binding_mdr": 0,
+   "betaling": "Bagud",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "Variabel pris Vest (DK1)",
+     "tillaeg_oere": 14.52,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 638,
+     "aarspris_4000": 929,
+     "aarspris_8000": 1510
+    }
+   ],
+   "score": 2.9
+  },
+  {
+   "navn": "Clever",
+   "slug": "clever",
+   "url": "https://skiftelaftale.dk/elselskaber/clever/",
+   "hjemmeside": "https://clever.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud (ingen aconto)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "Clever Power",
+     "tillaeg_oere": 0,
+     "abo_kr_md": 59,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 708,
+     "aarspris_4000": 708,
+     "aarspris_8000": 708
+    }
+   ],
+   "score": 4.5
+  },
+  {
+   "navn": "Kärnfull Energi",
+   "slug": "kaernfull",
+   "url": "https://skiftelaftale.dk/elselskaber/kaernfull/",
+   "hjemmeside": "https://karnfull.dk",
+   "binding_mdr": 0,
+   "betaling": "Forud (aconto)",
+   "gebyr_kr_aar": 77.64,
+   "aftaler": [
+    {
+     "navn": "Kärnfull Atomkraft",
+     "tillaeg_oere": 7.42,
+     "abo_kr_md": 39,
+     "trin": null,
+     "gebyr_kr_aar": 77.64,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 694,
+     "aarspris_4000": 842,
+     "aarspris_8000": 1139
+    }
+   ],
+   "score": 3.1
+  },
+  {
+   "navn": "Nordisk Energi",
+   "slug": "nordisk-energi",
+   "url": "https://skiftelaftale.dk/elselskaber/nordisk-energi/",
+   "hjemmeside": "https://nordiskenergi.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "Spot",
+     "tillaeg_oere": 5.0,
+     "abo_kr_md": 0,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 100,
+     "aarspris_4000": 200,
+     "aarspris_8000": 400
+    },
+    {
+     "navn": "Flex",
+     "tillaeg_oere": 0.8,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 364,
+     "aarspris_4000": 380,
+     "aarspris_8000": 412
+    },
+    {
+     "navn": "Spot+ (grøn)",
+     "tillaeg_oere": 30.0,
+     "abo_kr_md": 0,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 600,
+     "aarspris_4000": 1200,
+     "aarspris_8000": 2400
+    },
+    {
+     "navn": "Flex+ (grøn)",
+     "tillaeg_oere": 25.8,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 864,
+     "aarspris_4000": 1380,
+     "aarspris_8000": 2412
+    }
+   ],
+   "score": 8.1
+  },
+  {
+   "navn": "SEF Energi",
+   "slug": "sef-energi",
+   "url": "https://skiftelaftale.dk/elselskaber/sef-energi/",
+   "hjemmeside": "https://sefenergi.dk",
+   "binding_mdr": 0,
+   "betaling": "Forud (aconto, månedlig)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "BareEl",
+     "tillaeg_oere": 0,
+     "abo_kr_md": 39,
+     "trin": [
+      [
+       6000,
+       39
+      ],
+      [
+       null,
+       59
+      ]
+     ],
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 468,
+     "aarspris_4000": 468,
+     "aarspris_8000": 708
+    },
+    {
+     "navn": "TimeEl",
+     "tillaeg_oere": 10.5,
+     "abo_kr_md": 19,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 438,
+     "aarspris_4000": 648,
+     "aarspris_8000": 1068
+    },
+    {
+     "navn": "MereEndEl",
+     "tillaeg_oere": 10.5,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 558,
+     "aarspris_4000": 768,
+     "aarspris_8000": 1188
+    }
+   ],
+   "score": 6.5
+  },
+  {
+   "navn": "Looad",
+   "slug": "looad",
+   "url": "https://skiftelaftale.dk/elselskaber/looad/",
+   "hjemmeside": "https://looad.dk",
+   "binding_mdr": 0,
+   "betaling": "Forud (aconto, faktura hver måned)",
+   "gebyr_kr_aar": 96,
+   "aftaler": [
+    {
+     "navn": "Looad Energy",
+     "tillaeg_oere": 8,
+     "abo_kr_md": 19,
+     "trin": null,
+     "gebyr_kr_aar": 96,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 484,
+     "aarspris_4000": 644,
+     "aarspris_8000": 964
+    }
+   ],
+   "score": 4.9
+  },
+  {
+   "navn": "evdk",
+   "slug": "evdk",
+   "url": "https://skiftelaftale.dk/elselskaber/evdk/",
+   "hjemmeside": "https://evdk.dk",
+   "binding_mdr": 0,
+   "betaling": "Forud (aconto, faktura hver måned)",
+   "gebyr_kr_aar": 96,
+   "aftaler": [
+    {
+     "navn": "evdk Elaftale",
+     "tillaeg_oere": 9,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 96,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 624,
+     "aarspris_4000": 804,
+     "aarspris_8000": 1164
+    }
+   ],
+   "score": 3.6
+  },
+  {
+   "navn": "Cheap Energy",
+   "slug": "cheap-energy",
+   "url": "https://skiftelaftale.dk/elselskaber/cheap-energy/",
+   "hjemmeside": "https://www.cheapenergy.dk",
+   "binding_mdr": 0,
+   "betaling": "Bagud ifølge produktsiden (FAQ nævner aconto forud)",
+   "gebyr_kr_aar": 0,
+   "aftaler": [
+    {
+     "navn": "Variabel Garanti",
+     "tillaeg_oere": 29,
+     "abo_kr_md": 29,
+     "trin": null,
+     "gebyr_kr_aar": 0,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 928,
+     "aarspris_4000": 1508,
+     "aarspris_8000": 2668
+    }
+   ],
+   "score": 2.4
+  },
+  {
+   "navn": "Greenbow",
+   "slug": "greenbow",
+   "url": "https://skiftelaftale.dk/elselskaber/greenbow/",
+   "hjemmeside": "https://greenbow.dk",
+   "binding_mdr": 6,
+   "betaling": "Forud (aconto og abonnement, Betalingsservice)",
+   "gebyr_kr_aar": 60,
+   "aftaler": [
+    {
+     "navn": "Greenbow Elaftale",
+     "tillaeg_oere": 12,
+     "abo_kr_md": 19,
+     "trin": null,
+     "gebyr_kr_aar": 60,
+     "gebyr_oere_kwh": 0,
+     "aarspris_2000": 528,
+     "aarspris_4000": 768,
+     "aarspris_8000": 1248
+    }
+   ],
+   "score": 2.7
+  }
+ ]
+}

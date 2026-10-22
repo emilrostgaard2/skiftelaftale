@@ -73,7 +73,9 @@
           (x.s.logo ? '<img src="' + rod + 'assets/img/logos/' + x.s.logo + '" alt="' + x.s.navn + ' logo" width="92" height="30" loading="lazy">' : '<span class="tekstlogo" aria-hidden="true">' + x.s.navn + '</span>') +
           '<span class="navn"><a href="' + rod + 'elselskaber/' + x.s.slug + '/">' + x.s.navn + '</a>' + (erMin(x) ? ' <span class="maerke gul">Din aftale i dag</span>' : '') + '<small>' + x.p.navn + ': ' + fmt(x.p.tillaeg, 1) + ' øre/kWh + ' + fmt(aboVed(x.p, kwh), 2) + ' kr./md.</small></span>' +
           '<span class="pris tal">' + kr(x.aar) + '<small>pr. år til elselskabet</small></span>' +
-          '<a class="knap" href="' + rod + 'go/' + x.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se aftalen hos ' + x.s.navn + ' (reklamelink)">' + knapTekst(x, kwh) + '</a></li>';
+          (x.s.partner === false
+            ? '<span class="rcta"><a class="knap neutral" href="' + x.s.web + '" rel="nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se hos selskabet: ' + x.s.navn + '">Se hos selskabet</a></span></li>'
+            : '<span class="rcta"><a class="knap" href="' + rod + 'go/' + x.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="beregner" aria-label="Se aftalen hos ' + x.s.navn + ' (reklamelink)">' + knapTekst(x, kwh) + '</a><span class="annonce">Reklamelink</span></span></li>');
       }).join('');
       var forskel = r[r.length - 1].aar - r[0].aar;
       if (spar) spar.innerHTML = 'Ved <b>' + kwh.toLocaleString('da-DK') + ' kWh</b> er der <b>' + kr(forskel) + '</b> om året til forskel på den billigste og den dyreste aftale i vores sammenligning.';
@@ -126,9 +128,19 @@
     };
     var regn = function () {
       var s0 = $('#sp-selskab');
-      if (s0 && !s0.value) { cancelAnimationFrame(raf); vist = 0; ud.textContent = '? kr.'; tx.textContent = 'Vælg dit nuværende elselskab, så regner vi resten ud.'; kn.style.display = 'none'; return; }
+      if (s0 && !s0.value) { cancelAnimationFrame(raf); vist = 0; ud.textContent = '? kr.'; tx.textContent = 'Vælg dit nuværende elselskab, så regner vi resten ud.'; kn.style.display = 'none'; var a0 = $('#sp-ann'); if (a0) a0.hidden = true; var p0 = $('#sp-partner'); if (p0) p0.hidden = true; return; }
       var kwh = Math.max(0, +fk.value || 0), nu = (+ft.value || 0) * kwh / 100 + (+fa.value || 0) * 12, b = rangliste(kwh)[0], forskel = nu - b.aar;
-      if (forskel > 0) { taelOp(forskel); tx.innerHTML = 'om året ved at skifte til <b style="font:inherit;color:#fff;font-weight:700">' + b.s.navn + '</b>. Du betaler ' + kr(nu) + ' til dit elselskab i dag. Hos ' + b.s.navn + ' ville det være ' + kr(b.aar); kn.style.display = ''; kn.textContent = 'Gå til ' + b.s.navn; kn.href = srod + 'go/' + b.s.slug + '/'; }
+      var spA = $('#sp-ann'), spP = $('#sp-partner');
+      var bp = rangliste(kwh).filter(function (x) { return x.s.partner; })[0];
+      if (spA) spA.hidden = !(forskel > 0 && b.s.partner);
+      if (spP) {
+        var nuSlug = (sel && sel.value) ? sel.value.split('|')[0] : '';
+        if (forskel > 0 && bp && !b.s.partner && bp.s.slug !== nuSlug && nu - bp.aar > 0) {
+          spP.hidden = false;
+          spP.innerHTML = '<p>Billigste samarbejdspartner: <b>' + bp.s.navn + '</b>, ' + kr(bp.aar) + ' om året (spar ' + kr(nu - bp.aar) + '). Gratis at skifte.</p><a class="knap sol" href="' + srod + 'go/' + bp.s.slug + '/" rel="sponsored nofollow noopener" target="_blank" data-pos="spar-partner">Gå til ' + bp.s.navn + '</a><span class="annonce">Reklamelink</span>';
+        } else { spP.hidden = true; spP.innerHTML = ''; }
+      }
+      if (forskel > 0) { taelOp(forskel); tx.innerHTML = 'om året ved at skifte til <b style="font:inherit;color:#fff;font-weight:700">' + b.s.navn + '</b>. Du betaler ' + kr(nu) + ' til dit elselskab i dag. Hos ' + b.s.navn + ' ville det være ' + kr(b.aar); kn.style.display = ''; kn.textContent = 'Gå til ' + b.s.navn; kn.classList.toggle('neutral', b.s.partner === false); if (b.s.partner === false) { kn.href = b.s.web; kn.rel = 'nofollow noopener'; kn.textContent = 'Se ' + b.s.navn; } else { kn.href = srod + 'go/' + b.s.slug + '/'; kn.rel = 'sponsored nofollow noopener'; } }
       else { cancelAnimationFrame(raf); vist = 0; ud.textContent = '0 kr.'; tx.textContent = 'Din aftale er allerede billigere end alle i vores sammenligning. Bliv, hvor du er.'; kn.style.display = 'none'; }
     };
     var sel = $('#sp-selskab'), man = [ft.closest('label'), fa.closest('label')];
