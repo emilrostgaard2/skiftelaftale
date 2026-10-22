@@ -4,6 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # NYT: kører hver dag kl. 13.30 dansk sommertid (12.30 vintertid), når morgendagens elpriser er ude
+  schedule:
+    - cron: "30 11 * * *"
 
 # Kun ét deploy ad gangen, så to pushes ikke uploader oven i hinanden
 concurrency:
@@ -20,8 +23,10 @@ jobs:
       - name: Hent kode
         uses: actions/checkout@v4
 
-      # Har sitet et build-trin (fx npm run build), så indsæt det her
-      # og ret local-dir nedenfor til build-mappen, fx ./dist/
+      # NYT: skriver dagens elpriser ind i HTML'en, så Google og AI-søgemaskiner kan se dem.
+      # Fejler hentningen, springer scriptet over, og siden uploades som normalt.
+      - name: Hent dagens elpriser ind i siderne
+        run: python3 tools/snapshot.py
 
       - name: Upload til Simply.com
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -41,3 +46,4 @@ jobs:
             README.md
             .env*
             **/.DS_Store
+            tools/**
