@@ -21,10 +21,29 @@ def ore(x): return f"{x:.1f}".replace(".", ",")
 def kr2(x): return f"{x:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".") + " kr."
 def pad(n): return f"{n:02d}"
 
+def _hent_json(url, forsog=8):
+    """Energi Data Service begrænser antal kald pr. IP (HTTP 429), og GitHubs servere deler IP. Vent og prøv igen."""
+    import time, urllib.error
+    sidste = None
+    for i in range(forsog):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "skiftelaftale.dk"})
+            with urllib.request.urlopen(req, timeout=60) as r: return json.load(r)
+        except urllib.error.HTTPError as ex:
+            sidste = ex
+            if ex.code not in (429, 500, 502, 503, 504): raise
+            vent = 20 + 15 * i
+            try:
+                m = re.search(r"(\d+)\s*second", ex.read().decode("utf-8", "ignore"))
+                if m: vent = min(int(m.group(1)) + 3, 120)
+            except Exception: pass
+            print(f"  venter {vent} sek. (HTTP {ex.code}, forsøg {i + 1} af {forsog})"); time.sleep(vent)
+        except Exception as ex:
+            sidste = ex; time.sleep(10 + 10 * i)
+    raise sidste
 def hent(start, slut):
     q = urllib.parse.urlencode({"start": start + "T00:00", "end": slut + "T00:00", "filter": json.dumps({"PriceArea": [OMR]}), "sort": "TimeDK asc", "limit": 5000})
-    req = urllib.request.Request("https://api.energidataservice.dk/dataset/DayAheadPrices?" + q, headers={"User-Agent": "skiftelaftale.dk snapshot"})
-    with urllib.request.urlopen(req, timeout=30) as r: return json.load(r)
+    return _hent_json("https://api.energidataservice.dk/dataset/DayAheadPrices?" + q)
 
 def timer(records):
     """Kvarterspriser -> timegennemsnit i øre/kWh inkl. moms. Nøgle: (dato, time)."""
