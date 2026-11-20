@@ -1,7 +1,7 @@
 {
  "kilde": "SkiftElaftale.dk",
  "licens": "CC BY 4.0",
- "tjekket": "2026-10-22",
+ "tjekket": "2026-11-20",
  "note": "Priser inkl. moms. tillaeg_oere = øre/kWh oven i spotpris. abo_kr_md = kr./md. gebyr_kr_aar = faste gebyrer ved billigste betalingsmåde.",
  "selskaber": [
   {
@@ -409,14 +409,14 @@
    "aftaler": [
     {
      "navn": "FlexEnergi",
-     "tillaeg_oere": 14.58,
+     "tillaeg_oere": 14.63,
      "abo_kr_md": 20,
      "trin": null,
      "gebyr_kr_aar": 0,
      "gebyr_oere_kwh": 0,
-     "aarspris_2000": 532,
-     "aarspris_4000": 823,
-     "aarspris_8000": 1406
+     "aarspris_2000": 533,
+     "aarspris_4000": 825,
+     "aarspris_8000": 1410
     }
    ],
    "score": 2.7

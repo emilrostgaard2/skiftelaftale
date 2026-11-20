@@ -53,11 +53,11 @@ def main():
             j30 = hent((idag - timedelta(days=30)).isoformat(), idag.isoformat())
         T = timer(j.get("records", [])); T30 = timer(j30.get("records", []))
     except Exception as ex:
-        print("snapshot: kunne ikke hente priser, springer over:", ex); return 0
+        print("::warning title=Elpriser ikke hentet::snapshot kunne ikke hente priser fra Energi Data Service:", ex); return 0
     dage = {"idag": [(h, v) for (d, h), v in T.items() if d == idag.isoformat()],
             "imorgen": [(h, v) for (d, h), v in T.items() if d == imorgen.isoformat()]}
     if len(dage["idag"]) < 20:
-        print("snapshot: for få timer for i dag, springer over"); return 0
+        print("::warning title=Elpriser ikke hentet::for få timer for i dag i svaret fra Energi Data Service"); return 0
     har_im = len(dage["imorgen"]) >= 20
     stempel = f"{idag.day}.{idag.month}.{idag.year} kl. {pad(nu.hour)}.{pad(nu.minute)}"
     filer = [f for f in glob.glob(os.path.join(ROD, "**", "*.html"), recursive=True) if "/tools/" not in f]
@@ -134,6 +134,13 @@ def main():
         t = open(lf, encoding="utf-8").read()
         t = re.sub(r"<!--SNAPSHOT-->.*?<!--/SNAPSHOT-->", f"<!--SNAPSHOT-->Spotpris Vestdanmark (DK1) {idag.isoformat()}: gennemsnit {ore(sum(v) / len(v))} øre/kWh inkl. moms, laveste {ore(min(v))} øre, højeste {ore(max(v))} øre. Kilde: Energi Data Service (Energinet).<!--/SNAPSHOT-->", t, flags=re.S)
         open(lf, "w", encoding="utf-8").write(t)
+    # sitemap: elpris-siderne har nye tal i dag
+    sf = os.path.join(ROD, "sitemap.xml")
+    if os.path.exists(sf):
+        s = open(sf, encoding="utf-8").read()
+        for u in ("elpriser/", "elpriser/i-morgen/", "kwh-pris/"):
+            s = re.sub(r"(<loc>https://skiftelaftale\.dk/" + re.escape(u) + r"</loc>\s*<lastmod>)[^<]*", lambda m: m.group(1) + idag.isoformat(), s)
+        open(sf, "w", encoding="utf-8").write(s)
     print(f"snapshot: {n} filer opdateret ({stempel})")
     return 0
 

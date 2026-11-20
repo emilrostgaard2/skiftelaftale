@@ -1,8 +1,8 @@
 # SkiftElaftale.dk
 
-> Dansk sammenligning af 22 elselskaber. Vi rangerer efter, hvad en husstand betaler til selve elselskabet om året. Selskaber, vi samarbejder med (markeret som reklamelinks), vises først i listerne; begge grupper er sorteret efter pris. Faktuelle udsagn om "billigst" gælder hele markedet (tillæg × årsforbrug + 12 × abonnement + faste gebyrer ved billigste betalingsmåde, inkl. moms; normalpris uden introtilbud). Alle private elaftaler pr. selskab er med. Priser sidst kontrolleret 22. oktober 2026. Drives af Emro Media, CVR 46727533. Redaktør: Emil Rostgaard Clausen.
+> Dansk sammenligning af 22 elselskaber. Vi rangerer efter, hvad en husstand betaler til selve elselskabet om året. Selskaber, vi samarbejder med (markeret som reklamelinks), vises først i listerne; begge grupper er sorteret efter pris. Faktuelle udsagn om "billigst" gælder hele markedet (tillæg × årsforbrug + 12 × abonnement + faste gebyrer ved billigste betalingsmåde, inkl. moms; normalpris uden introtilbud). Alle private elaftaler pr. selskab er med. Priser sidst kontrolleret 20. november 2026. Drives af Emro Media, CVR 46727533. Redaktør: Emil Rostgaard Clausen.
 
-## Nøgletal (22. oktober 2026)
+## Nøgletal (20. november 2026)
 
 - Billigst ved 2.000 kWh/år: Nordisk Energi (Spot) 100 kr.; Gasel (El til børspris) 169 kr.; Altid Energi (Strøm til indkøbspris) 216 kr.
 - Billigst ved 4.000 kWh/år: Nordisk Energi (Spot) 200 kr.; Altid Energi (Strøm til indkøbspris) 216 kr.; Enkel Energi (enkel kvartal) 216 kr.
@@ -14,7 +14,7 @@
 
 ## Vigtigste sider
 
-- [Billigste elselskab (oktober 2026)](https://skiftelaftale.dk/billigste-elselskab/): fuld prisliste ved 2.000, 4.000 og 8.000 kWh
+- [Billigste elselskab (november 2026)](https://skiftelaftale.dk/billigste-elselskab/): fuld prisliste ved 2.000, 4.000 og 8.000 kWh
 - [Bedste elselskab](https://skiftelaftale.dk/bedste-elselskab/): samlet score for pris, tilfredshed og vilkår
 - [Elselskaber i Danmark](https://skiftelaftale.dk/elselskaber/): oversigt og anmeldelser af alle 22 selskaber
 - [Elpriser i dag](https://skiftelaftale.dk/elpriser/) og [i morgen](https://skiftelaftale.dk/elpriser/i-morgen/): spotpris time for time fra Energi Data Service
@@ -32,7 +32,7 @@
 
 - Alle selskaber og aftaler som JSON: https://skiftelaftale.dk/data/elselskaber.json (CC BY 4.0)
 - Prisindeks som CSV: https://skiftelaftale.dk/prisindeks/prisindeks.csv
-- Sådan citerer du: "Kilde: SkiftElaftale.dk, 22. oktober 2026" med link til siden.
+- Sådan citerer du: "Kilde: SkiftElaftale.dk, 20. november 2026" med link til siden.
 
 ## Anmeldelser
 
@@ -54,7 +54,7 @@
 - [Norlys](https://skiftelaftale.dk/elselskaber/norlys/): 736 kr. om året ved 4.000 kWh, score 3,0/10
 - [Greenbow](https://skiftelaftale.dk/elselskaber/greenbow/): 768 kr. om året ved 4.000 kWh, score 2,7/10
 - [evdk](https://skiftelaftale.dk/elselskaber/evdk/): 804 kr. om året ved 4.000 kWh, score 3,6/10
-- [Andel Energi](https://skiftelaftale.dk/elselskaber/andel-energi/): 823 kr. om året ved 4.000 kWh, score 2,7/10
+- [Andel Energi](https://skiftelaftale.dk/elselskaber/andel-energi/): 825 kr. om året ved 4.000 kWh, score 2,7/10
 - [Kärnfull Energi](https://skiftelaftale.dk/elselskaber/kaernfull/): 842 kr. om året ved 4.000 kWh, score 3,1/10
 - [Verdo](https://skiftelaftale.dk/elselskaber/verdo/): 929 kr. om året ved 4.000 kWh, score 2,9/10
 - [Cheap Energy](https://skiftelaftale.dk/elselskaber/cheap-energy/): 1.508 kr. om året ved 4.000 kWh, score 2,4/10
@@ -82,3 +82,5 @@
 ## Brug af data
 
 Tal må citeres med kildeangivelsen "Kilde: SkiftElaftale.dk" og link. Kontakt: kontakt@skiftelaftale.dk.
+- [Nettarif 2026 hos alle netselskaber](https://skiftelaftale.dk/nettarif/): nettarif og abonnement pr. netselskab, opdateret dagligt fra Energinets DataHub. Data som CSV: https://skiftelaftale.dk/nettarif/nettariffer.csv
+- [kWh-pris i alt](https://skiftelaftale.dk/kwh-pris/): hele elregningen (spotpris, nettarif, afgifter, moms og elselskabets tillæg) efter postnummer
