@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  # NYT: kører hver dag kl. 13.30 dansk sommertid (12.30 vintertid), når morgendagens elpriser er ude
+  # Hver dag kl. 13.30 dansk vintertid (12.30 UTC), når morgendagens elpriser er ude
   schedule:
-    - cron: "30 11 * * *"
+    - cron: "30 12 * * *"
 
 # Kun ét deploy ad gangen, så to pushes ikke uploader oven i hinanden
 concurrency:
@@ -15,16 +15,25 @@ concurrency:
 
 jobs:
   deploy:
-    name: Upload via FTP
+    name: Hent elpriser og upload via FTP
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
 
     steps:
       - name: Hent kode
         uses: actions/checkout@v4
 
-      # NYT: skriver dagens elpriser ind i HTML'en, så Google og AI-søgemaskiner kan se dem.
-      # Fejler hentningen, springer scriptet over, og siden uploades som normalt.
+      - name: Sæt Python op
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # Henter nettariffer, Energinets tariffer og 30 dages spotpris og regner "hele elregningen" ud i siderne.
+      - name: Hent nettariffer og byg hele elregningen
+        run: python3 tools/nettariffer.py
+
+      # Skriver dagens spotpriser ind i HTML-filerne, så Google ser rigtige tal i stedet for "–".
+      # Fejler hentningen, uploades siden alligevel (uden friske tal), og der vises en advarsel her.
       - name: Hent dagens elpriser ind i siderne
         run: python3 tools/snapshot.py
 
@@ -42,8 +51,13 @@ jobs:
             **/.git*
             **/.git*/**
             .github/**
+            tools/**
             **/node_modules/**
             README.md
             .env*
             **/.DS_Store
-            tools/**
+
+      # Fortæller Bing m.fl., at siderne er opdateret (IndexNow). Ved upload og manuel kørsel sendes alle adresser, ved den daglige kørsel kun elpris-siderne.
+      - name: Giv søgemaskinerne besked
+        if: success()
+        run: python3 tools/indexnow.py ${{ github.event_name != 'schedule' && '--alle' || '' }}
