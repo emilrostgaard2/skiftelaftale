@@ -63,10 +63,28 @@ def dk(x, d=0):
     s = f"{x:,.{d}f}".replace(",", "X").replace(".", ",").replace("X", ".")
     return s
 def kr(x): return dk(round(x)) + " kr."
+def _hent_json(url, forsog=8):
+    """Energi Data Service begrænser antal kald pr. IP (HTTP 429), og GitHubs servere deler IP. Vent og prøv igen."""
+    import time, urllib.error
+    sidste = None
+    for i in range(forsog):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "skiftelaftale.dk"})
+            with urllib.request.urlopen(req, timeout=60) as r: return json.load(r)
+        except urllib.error.HTTPError as ex:
+            sidste = ex
+            if ex.code not in (429, 500, 502, 503, 504): raise
+            vent = 20 + 15 * i
+            try:
+                m = re.search(r"(\d+)\s*second", ex.read().decode("utf-8", "ignore"))
+                if m: vent = min(int(m.group(1)) + 3, 120)
+            except Exception: pass
+            print(f"  venter {vent} sek. (HTTP {ex.code}, forsøg {i + 1} af {forsog})"); time.sleep(vent)
+        except Exception as ex:
+            sidste = ex; time.sleep(10 + 10 * i)
+    raise sidste
 def hent(dataset, **q):
-    url = API + dataset + "?" + urllib.parse.urlencode(q)
-    req = urllib.request.Request(url, headers={"User-Agent": "skiftelaftale.dk nettariffer"})
-    with urllib.request.urlopen(req, timeout=60) as r: return json.load(r)["records"]
+    return _hent_json(API + dataset + "?" + urllib.parse.urlencode(q))["records"]
 def priser(rec):
     p1 = rec.get("Price1") or 0.0
     return [float(rec.get(f"Price{i}") if rec.get(f"Price{i}") is not None else p1) for i in range(1, 25)]

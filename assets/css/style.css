@@ -1231,3 +1231,99 @@ table.stak tr.sum th,table.stak tr.sum td{border-top:2px solid #cfdcd8;font-weig
 .g3-hel-f label{font-weight:700;font-size:.95rem;display:grid;gap:4px}
 .g3-hel-t{margin:12px 0 0!important}
 @media(max-width:700px){.helregning{padding:18px 14px}.hr-felter{grid-template-columns:1fr}.hr-forbrug{grid-template-columns:1fr 1fr}.hr-eget{grid-column:1/-1}.hr-dele li{grid-template-columns:minmax(0,1fr) 80px}.hr-bar{display:none}.g3-hel-f{grid-template-columns:1fr}}
+/* ===== v22: design "Testvinderen" ===== */
+@font-face{font-family:"Source Sans 3";src:url("../fonts/source-sans.woff2") format("woff2");font-weight:200 900;font-display:swap}
+@font-face{font-family:"Montserrat";src:url("../fonts/montserrat.woff2") format("woff2");font-weight:100 900;font-display:swap}
+:root{--tekst:"Source Sans 3",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--display:"Montserrat","Source Sans 3",system-ui,sans-serif;
+--v2:#0a8a58;--v2-dyb:#0b6b45;--v2-lys:#e9f6ef;--v2-kant:#dfe3ea;--v2-felt:#c3cad6;--skov:#0b3d2e;--cta:#f26b21;--cta-dyb:#c9520f;--blaek:#1c2333;--graa:#55607a;--bund:#f4f5f7;
+--strom:#0a8a58;--strom-dyb:#0b6b45;--strom-lys:#e9f6ef;--nat:#1c2333;--nat-2:#3d475c;--nat-3:#55607a;--kant:#dfe3ea;--plade:#f4f5f7;--billig:#0a8a58;--billig-lys:#e9f6ef}
+body{font-family:var(--tekst);color:var(--blaek);background:#fff;font-size:1.09rem}
+h1,h2,h3,h4,.logo,.knap,.hh-faner button,.tal{font-family:var(--display)}
+h1{font-weight:800;letter-spacing:-.02em}h2{font-weight:800;letter-spacing:-.015em}h3{font-weight:700}
+.tal{font-weight:800;letter-spacing:-.01em}
+/* top */
+.oplysning{background:var(--skov);color:#d9ebe3;border:0}.oplysning a{color:#fff}
+.top{background:#fff;border-bottom:3px solid var(--v2);box-shadow:none}
+.logo{display:inline-flex;align-items:center;gap:10px;font-weight:800;color:var(--blaek);letter-spacing:-.01em}.logo b{color:var(--blaek);font-weight:800}.logo svg.logo-m{display:block;flex:none;width:36px;height:36px;border-radius:9px;box-shadow:none}
+.menu a{font-family:var(--display);font-weight:600;font-size:.9rem;color:var(--blaek)}
+.fod .logo-m{display:none}
+/* knapper: orange til handling */
+.knap{background:var(--cta);color:#fff;border-radius:8px;font-weight:700;box-shadow:0 3px 0 var(--cta-dyb);border:0}
+.knap:hover{background:#e25f17;color:#fff;box-shadow:0 3px 0 var(--cta-dyb)}
+.knap.lille,.top .knap.lille,.menu a.knap,.menu a.knap.lille{background:var(--cta);color:#fff;border:0}
+.knap.stille,.knap.lys,.knap.neutral,.knap.lille.neutral,.knap.hvid{background:#fff;color:var(--blaek);border:1.5px solid var(--v2-felt);box-shadow:none}
+.knap.stille:hover,.knap.lys:hover,.knap.neutral:hover{background:var(--bund);color:var(--blaek);box-shadow:none}
+.resultat .knap:not(.neutral),.indhold a.knap:not(.stille):not(.neutral):not(.lys),.sidebar .knap:not(.stille):not(.neutral),aside .knap:not(.stille):not(.neutral){background:var(--cta);color:#fff;border:0;box-shadow:0 3px 0 var(--cta-dyb)}
+.resultat .knap:not(.neutral):hover,.indhold a.knap:not(.stille):not(.neutral):not(.lys):hover,aside .knap:not(.stille):not(.neutral):hover{background:#e25f17;color:#fff}
+/* hero på alle sider */
+.hero,.hero-b,.hero-q1,.hero-h{background:linear-gradient(135deg,var(--skov),var(--v2));color:#fff;border:0}
+.hero h1,.hero .led,.hero p,.hero li,.hero .by-navn,.hero .by-meta,.hero .by-meta span{color:#fff}
+.hero a:not(.knap){color:#fff}
+.hero p.led,.hero-h p.led{color:#fff;opacity:.96}
+.hero .byline{background:rgba(255,255,255,.12);border:0;border-radius:10px;padding:12px 16px;display:inline-flex}
+.hero .byline .foto{border:3px solid #fff}
+.hero .tjek{background:rgba(255,255,255,.18);color:#fff;border:0}
+.hero .plade,.hero .hero-boks,.hero .top3,.hero .notits,.hero table,.hero .q1-kort,.hero .q2-kort,.hero details,.hero .toc{color:var(--blaek)}
+.hero .plade p,.hero .plade li,.hero .hero-boks p,.hero .hero-boks li,.hero .notits p,.hero .q1-kort p,.hero .q1-kort li,.hero details p,.hero details li,.hero .toc li{color:var(--blaek)}
+.hero .plade a:not(.knap),.hero .hero-boks a:not(.knap),.hero .notits a:not(.knap),.hero .q1-kort a:not(.knap),.hero details a:not(.knap),.hero .toc a{color:var(--v2-dyb)}
+.krumme{background:var(--skov);box-shadow:0 0 0 100vmax var(--skov);color:#cfe3da;border:0}.krumme li+li::before{color:#7fa898}.krumme a{color:#fff}.krumme li,.krumme span{color:#cfe3da}
+/* flader */
+.sektion.tonet{background:var(--bund)}
+.plade,.top3,.hero-boks,.q2-kort .guide,.t3{border:1px solid var(--v2-kant);border-radius:10px;box-shadow:0 6px 24px rgba(28,35,51,.1)}
+.notits{border-radius:8px}
+a{color:var(--v2-dyb)}
+.fod{background:var(--skov);color:#cfe3da}.fod a,.fod .logo,.fod .logo b,.fod-h,.fod p,.fod li,.fod small{color:#e7f3ee}.fod a:hover{color:#fff}
+/* forside: hero H */
+.hero-h{padding:34px 0 0}
+.hh-gitter{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center}
+.hero-h h1{font-size:clamp(1.65rem,3.3vw,2.55rem);line-height:1.15;max-width:17em;margin:0}
+.hero-h .led{font-size:1.2rem;margin:10px 0 0;max-width:34em}
+.hh-emil{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.13);border-radius:10px;padding:14px 18px;text-decoration:none;color:#fff;min-width:310px}
+.hh-emil img{width:62px;height:62px;border-radius:50%;border:3px solid #fff;object-fit:cover}
+.hh-emil b{display:block;font-family:var(--display);font-size:.95rem}.hh-emil span span{display:block;font-size:.92rem;opacity:.92}
+.hh-faner{display:flex;gap:6px;margin-top:30px}
+.hh-faner button{background:rgba(255,255,255,.2);color:#fff;border:0;border-radius:8px 8px 0 0;padding:12px 20px;font-weight:700;font-size:.92rem;cursor:pointer;min-height:58px}
+.hh-faner button small{display:block;font-family:var(--tekst);font-weight:400;font-size:.82rem;opacity:.9}
+.hh-faner button[aria-pressed=true]{background:#fff;color:var(--blaek)}
+.hh-faner button:hover{background:rgba(255,255,255,.32)}.hh-faner button[aria-pressed=true]:hover{background:#fff}
+.hh-sek{background:var(--bund);padding:0 0 40px}
+.hh-liste{background:#fff;border-radius:0 10px 10px 10px;box-shadow:0 6px 24px rgba(28,35,51,.12);padding:6px 22px 16px}
+.hh-valg{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--v2-kant)}
+.hh-valg label{font-weight:700;font-size:.95rem}
+.hh-valg select{font:inherit;font-weight:600;border:1.5px solid var(--v2-felt);border-radius:8px;padding:9px 12px;background:#fff;color:var(--blaek);min-height:46px;max-width:100%}
+.hh-valg-t{margin-left:auto;color:var(--graa);font-size:.95rem}
+.hh-rk{list-style:none;margin:0;padding:0}
+.hh-r{display:grid;grid-template-columns:52px 150px minmax(0,1.6fr) 70px minmax(0,1fr) auto;gap:20px;align-items:center;padding:18px 0;border-bottom:1px solid var(--v2-kant)}
+.hh-med{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:1.2rem;color:#fff;background:#9aa3b5;box-shadow:inset 0 -3px 0 rgba(0,0,0,.2)}
+.hh-r:nth-child(1) .hh-med{background:#d99a00}.hh-r:nth-child(3) .hh-med{background:#b06a2e}.hh-r:nth-child(n+4) .hh-med{background:#c4cad6;color:var(--blaek)}
+.hh-logo img{height:32px;width:auto;max-width:135px;object-fit:contain}
+.hh-inf h3{font-size:1.02rem;margin:0;line-height:1.3}.hh-inf p{margin:2px 0 0;font-size:.92rem;color:var(--graa)}
+.hh-tag{display:inline-block;background:var(--v2-lys);color:var(--v2-dyb);font-weight:700;font-size:.8rem;border-radius:4px;padding:1px 8px;margin-bottom:4px}
+.hh-an{font-family:var(--tekst);font-size:.72rem;font-weight:400;color:var(--graa);border:1px solid var(--v2-felt);border-radius:3px;padding:0 5px;vertical-align:middle;white-space:nowrap}
+.hh-st{display:inline-flex;gap:2px;vertical-align:-3px;margin-right:4px}.hh-st i{width:17px;height:17px;display:block;position:relative;background:#d5d8de}.hh-st i.on{background:#00b67a}
+.hh-st i::after{content:"";position:absolute;inset:2.5px;background:#fff;clip-path:polygon(50% 0,62% 36%,100% 38%,70% 60%,80% 100%,50% 76%,20% 100%,30% 60%,0 38%,38% 36%)}
+.hh-sc{width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--v2) var(--p),#e6e8ee 0);display:grid;place-items:center;text-decoration:none}
+.hh-sc b{width:50px;height:50px;border-radius:50%;background:#fff;display:grid;place-items:center;font-family:var(--display);font-size:1.02rem;color:var(--blaek)}
+.hh-pr b{font-size:1.55rem;display:block;line-height:1.1;white-space:nowrap}.hh-pr small{font-size:.85rem;color:var(--graa);display:block}
+.hh-spar{color:var(--v2-dyb);font-weight:700;font-size:.9rem;display:block}.hh-spar.neutral{color:var(--graa)}
+.hh-cta{text-align:center}.hh-kn{min-height:50px;padding:13px 22px;white-space:nowrap;display:inline-flex}
+.hh-anm{display:block;font-size:.85rem;color:var(--graa);margin-top:9px}
+.hh-fod{font-size:.88rem;color:var(--graa);margin:12px 0 0}
+.hh-ber-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px);gap:44px;align-items:start}
+.hh-ber .garantier{margin-top:18px}
+@media(max-width:900px){.hh-gitter{grid-template-columns:1fr;gap:16px}.hh-emil{min-width:0;padding:10px 12px}.hh-emil img{width:46px;height:46px}
+.hero-h{padding-top:20px}.hero-h .led{font-size:1.05rem}
+.hh-faner{margin-top:18px;gap:4px}.hh-faner button{flex:1;padding:9px 4px;font-size:.82rem;min-height:54px}
+.hh-liste{padding:4px 12px 14px;border-radius:0 0 10px 10px}.hh-sek .bred{padding-left:10px;padding-right:10px}
+.hh-valg-t{margin-left:0;width:100%}.hh-valg select{flex:1;min-width:0}
+.hh-r{grid-template-columns:38px minmax(0,1fr) auto;gap:8px 10px;padding:14px 0}
+.hh-med{width:36px;height:36px;font-size:1rem}.hh-logo img{max-width:110px;height:28px}
+.hh-inf{grid-column:1/-1;order:5}.hh-sc{display:none}.hh-r>span:empty{display:none}.hh-pr{text-align:right}.hh-pr b{font-size:1.3rem}
+.hh-cta{grid-column:1/-1;order:6}.hh-kn{display:flex;width:100%}.hh-anm{display:none}
+.hh-ber-g{grid-template-columns:1fr;gap:20px}}
+
+.hero dt,.hero dd,.hero small,.hero .q1-tal span,.hero .q1-tal b,.hero [class*=tal] span,.hero .q1-tekst span,.hero .q1-tekst b{color:#fff}
+.hero .q1-kort span,.hero .q1-kort b,.hero .q1-kort small,.hero .plade span,.hero .plade b,.hero .hero-boks span,.hero .hero-boks b{color:inherit}
+.hero .q1-eyb,.hero .q1-eyb *{color:var(--blaek)}
+@media(max-width:900px){.logo{font-size:1.02rem;gap:7px}.logo svg.logo-m{width:30px;height:30px}}
+.fod *{color:#dcebe4}.fod a{color:#fff}.fod hr,.fod .fod-bund{border-color:#2c5a4a}
