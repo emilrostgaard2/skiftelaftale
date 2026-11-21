@@ -1,7 +1,7 @@
 /* SkiftElaftale.dk – stylesheet
    Farver: Nat (blæk), Strøm (kobolt), Sol (gul), Billig (grøn), Dyr (rød), Plade (lys flade) */
 
-@font-face{font-family:"Figtree";src:url("../fonts/figtree.woff2") format("woff2");font-weight:300 900;font-display:swap}
+
 
 :root{
   --nat:#0E1B3D; --nat-2:#33406A; --nat-3:#6B7699;
@@ -1346,3 +1346,14 @@ a{color:var(--v2-dyb)}
 @media(max-width:800px){.blog-kort{grid-template-columns:1fr}.to-kol{columns:1}}
 .menu a{white-space:nowrap}
 @media(min-width:901px) and (max-width:1180px){.menu{gap:2px}.menu a{font-size:.8rem;padding-left:7px;padding-right:7px}.menu a.knap{padding:8px 12px}.logo{font-size:1.05rem}}
+/* ===== v25 ===== */
+:root{--cta:#c2500f;--cta-dyb:#8f3a08}
+.knap:hover,.resultat .knap:not(.neutral):hover,.indhold a.knap:not(.stille):not(.neutral):not(.lys):hover,aside .knap:not(.stille):not(.neutral):hover{background:#a8440b}
+.hh-faner button[aria-pressed=true] small{color:var(--blaek);opacity:1}
+.hh-med,.hh-r:nth-child(1) .hh-med,.hh-r:nth-child(3) .hh-med{color:#1c2333}.hh-r:nth-child(1) .hh-med{background:#f0b429}.hh-r:nth-child(2) .hh-med{background:#c9ced9}.hh-r:nth-child(3) .hh-med{background:#e0a071}
+.hh-h2{font-size:1.25rem;margin:14px 0 0}
+.fod a,.krumme a{display:inline-block;min-height:44px;line-height:1.3;padding-top:12px;padding-bottom:12px}
+.oplysning a{display:inline-block;padding:10px 4px}
+.top .logo{min-height:44px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.opsig-links{background:var(--bund);border-radius:8px;padding:12px 16px}

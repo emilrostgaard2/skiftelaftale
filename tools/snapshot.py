@@ -41,14 +41,15 @@ def _hent_json(url, forsog=8):
         except Exception as ex:
             sidste = ex; time.sleep(10 + 10 * i)
     raise sidste
-def hent(start, slut):
-    q = urllib.parse.urlencode({"start": start + "T00:00", "end": slut + "T00:00", "filter": json.dumps({"PriceArea": [OMR]}), "sort": "TimeDK asc", "limit": 5000})
+def hent(start, slut, omr=None):
+    q = urllib.parse.urlencode({"start": start + "T00:00", "end": slut + "T00:00", "filter": json.dumps({"PriceArea": omr or [OMR]}), "sort": "TimeDK asc", "limit": 5000})
     return _hent_json("https://api.energidataservice.dk/dataset/DayAheadPrices?" + q)
 
-def timer(records):
+def timer(records, omr=None):
     """Kvarterspriser -> timegennemsnit i øre/kWh inkl. moms. Nøgle: (dato, time)."""
     m = {}
     for x in records:
+        if x.get("PriceArea") not in (None, omr or OMR): continue
         t = x.get("TimeDK") or x.get("HourDK"); p = x.get("DayAheadPriceDKK", x.get("SpotPriceDKK"))
         if t is None or p is None: continue
         d = datetime.fromisoformat(t)
@@ -68,9 +69,10 @@ def main():
         if "--mock" in sys.argv:
             j = json.load(open(sys.argv[sys.argv.index("--mock") + 1])); j30 = j
         else:
-            j = hent(idag.isoformat(), (idag + timedelta(days=2)).isoformat())
+            j = hent(idag.isoformat(), (idag + timedelta(days=2)).isoformat(), ["DK1", "DK2"])
             j30 = hent((idag - timedelta(days=30)).isoformat(), idag.isoformat())
         T = timer(j.get("records", [])); T30 = timer(j30.get("records", []))
+        T2 = timer(j.get("records", []), "DK2")
     except Exception as ex:
         print("::warning title=Elpriser ikke hentet::snapshot kunne ikke hente priser fra Energi Data Service:", ex); return 0
     dage = {"idag": [(h, v) for (d, h), v in T.items() if d == idag.isoformat()],
@@ -79,11 +81,28 @@ def main():
         print("::warning title=Elpriser ikke hentet::for få timer for i dag i svaret fra Energi Data Service"); return 0
     har_im = len(dage["imorgen"]) >= 20
     stempel = f"{idag.day}.{idag.month}.{idag.year} kl. {pad(nu.hour)}.{pad(nu.minute)}"
+    # dagens pris i alt (spot + nettarif + Energinet + elafgift, inkl. moms) for N1 og Radius
+    dag_tekst = None
+    try:
+        nt = json.load(open(os.path.join(ROD, "data", "nettariffer.json"), encoding="utf-8")); st = nt["stat"]
+        def alt(Tx, net):
+            n = nt["net"][net]
+            return [(h, v + (n["tarif"][h] + st["system"] + st["transmission"] + st["elafgift"]) * 1.25) for (d, h), v in Tx.items() if d == idag.isoformat()]
+        a1 = alt(T, "n1"); a2 = alt(T2, "radius")
+        if len(a1) >= 20 and len(a2) >= 20:
+            k2 = lambda x: f"{x / 100:.2f}".replace(".", ",")
+            v1 = [x for _, x in a1]; v2 = [x for _, x in a2]; b = a1[v1.index(min(v1))]; dy = a1[v1.index(max(v1))]
+            MD = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"]
+            dag_tekst = (f"I dag, {idag.day}. {MD[idag.month - 1]} {idag.year}, koster strøm i gennemsnit <b>{k2(sum(v1) / len(v1))} kr. pr. kWh i Vestdanmark</b> og <b>{k2(sum(v2) / len(v2))} kr. i Østdanmark</b>, alt inkl. "
+                         f"I Vestdanmark er strømmen billigst kl. {pad(b[0])}–{pad((b[0] + 1) % 24)} med {k2(b[1])} kr. og dyrest kl. {pad(dy[0])}–{pad((dy[0] + 1) % 24)} med {k2(dy[1])} kr. "
+                         f"Tallene er spotpris, nettarif hos N1 og Radius, Energinets tariffer, elafgift og moms, men uden dit elselskabs tillæg.")
+    except Exception as ex:
+        print("::warning title=Pris i alt ikke beregnet::", ex)
     filer = [f for f in glob.glob(os.path.join(ROD, "**", "*.html"), recursive=True) if "/tools/" not in f]
     n = 0
     for fil in filer:
         h = open(fil, encoding="utf-8").read()
-        if "data-snap" not in h and "llms" not in fil: continue
+        if "data-snap" not in h: continue
         start = "imorgen" if ('data-start="imorgen"' in h and har_im) else "idag"
         dag = dage[start]; v = [x for _, x in dag]
         lo, hi, snit = min(v), max(v), sum(v) / len(v)
@@ -98,6 +117,13 @@ def main():
             h = saet(h, "imorgen", f"I morgen ligger gennemsnittet på {ore(sum(im_v) / len(im_v))} øre/kWh inkl. moms.")
         else:
             h = saet(h, "imorgen", "Morgendagens priser offentliggøres normalt omkring kl. 13.")
+        if dag_tekst and 'data-snap="dag-tekst"' in h:
+            h = saet(h, "dag-tekst", dag_tekst, attr="data-snap")
+        if 'data-snap-dato' in h:   # sidens tal er nye i dag: synlig dato og strukturerede data følger med
+            MD = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"]
+            h = re.sub(r'(Opdateret <time datetime=")[^"]*(">)[^<]*(</time>)', lambda m: m.group(1) + idag.isoformat() + m.group(2) + f"{idag.day}. {MD[idag.month - 1]} {idag.year}" + m.group(3), h, count=1)
+            h = re.sub(r'("dateModified": ?")\d{4}-\d{2}-\d{2}', lambda m: m.group(1) + idag.isoformat(), h)
+            h = re.sub(r'(<meta property="article:modified_time" content=")[^"]*', lambda m: m.group(1) + idag.isoformat(), h)
         h = saet(h, "snap-tekst", f"Tallene er et øjebliksbillede for Vestdanmark (DK1) {dagnavn} fra {stempel} og opdateres live, når siden åbnes.", attr="data-snap")
         # graf (kun hvis den er synlig)
         if re.search(r'<div id="graf" class="graf"', h):

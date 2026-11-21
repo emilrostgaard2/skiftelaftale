@@ -59,6 +59,7 @@ NET = {
 ENERGINET_GLN = "5790000432752"
 STAT = {"transmission": "40000", "system": "41000", "elafgift": "EA-001"}
 
+HIST_FRA = "2026-11-01"   # ældre måneder står fast i elpriser/historik/
 def dk(x, d=0):
     s = f"{x:,.{d}f}".replace(",", "X").replace(".", ",").replace("X", ".")
     return s
@@ -127,16 +128,26 @@ def hent_alt():
         ud["net"][key] = {"navn": navn, "omraade": omr, "tarif": p, "lav": min(p), "hoj": sorted(set(p))[len(set(p)) // 2] if len(set(p)) > 1 else p[0], "spids": max(p),
                           "snit": round(sum(p) / 24, 3), "abo": round(float(a["Price1"]), 2) if a else None, "kode": t["ChargeTypeCode"], "gyldig_fra": t["ValidFrom"][:10]}
     if len(ud["net"]) < 20: raise RuntimeError("for få netselskaber fundet: %d" % len(ud["net"]))
-    # spotpris: gennemsnit seneste 30 dage pr. prisområde
+    # spotpris: seneste 30 dage (snit + døgnprofil) og månedssnit siden HIST_FRA
     slut = nu.date(); fra = slut - timedelta(days=30)
-    sp = hent("DayAheadPrices", start=fra.isoformat() + "T00:00", end=slut.isoformat() + "T00:00", limit=0, columns="PriceArea,DayAheadPriceDKK", filter=json.dumps({"PriceArea": ["DK1", "DK2"]}))
-    s = {}
+    hfra = min(fra.isoformat(), HIST_FRA)
+    sp = hent("DayAheadPrices", start=hfra + "T00:00", end=slut.isoformat() + "T00:00", limit=0, columns="TimeDK,PriceArea,DayAheadPriceDKK", filter=json.dumps({"PriceArea": ["DK1", "DK2"]}))
+    s = {}; prof = {}; md = {}
     for x in sp:
-        if x.get("DayAheadPriceDKK") is None: continue
-        a = s.setdefault(x["PriceArea"], [0.0, 0]); a[0] += x["DayAheadPriceDKK"]; a[1] += 1
+        p = x.get("DayAheadPriceDKK"); t = x.get("TimeDK") or ""
+        if p is None or len(t) < 13: continue
+        o = x["PriceArea"]
+        if t[:7] >= HIST_FRA[:7]:
+            m = md.setdefault(t[:7], {}).setdefault(o, [0.0, 0, 0]); m[0] += p; m[1] += 1; m[2] += 1 if p < 0 else 0
+        if t[:10] >= fra.isoformat():
+            a = s.setdefault(o, [0.0, 0]); a[0] += p; a[1] += 1
+            h = prof.setdefault(o, {}).setdefault(int(t[11:13]), [0.0, 0]); h[0] += p; h[1] += 1
     ud["spot30"] = {o: round(v[0] / v[1] / 10, 2) for o, v in s.items()}
     ud["spot30"].update(fra=fra.isoformat(), til=slut.isoformat())
     if "DK1" not in ud["spot30"] or "DK2" not in ud["spot30"]: raise RuntimeError("mangler spotpriser")
+    ud["profil30"] = {o: [round(prof[o][h][0] / prof[o][h][1] / 10, 2) if h in prof[o] else None for h in range(24)] for o in ("DK1", "DK2")}
+    # månedssnit: øre/kWh uden moms, antal kvarterer med negativ pris omregnet til timer
+    ud["maaneder"] = {k: {o: {"snit": round(v[0] / v[1] / 10, 2), "neg_timer": round(v[2] / 4)} for o, v in sorted(om.items())} for k, om in sorted(md.items())}
     return ud
 
 # ---------------- beregning ----------------
@@ -226,6 +237,46 @@ def blok_billigste(d, rod):
     return (f'<p>Tallene på denne side er den del, du betaler til elselskabet. Lægger vi spotpris, nettarif, Energinets tariffer, elafgift og moms oveni, ser hele regningen sådan ud ved 4.000 kWh om året ({dato_txt(d["opdateret"])}):</p>'
             f'<ul>{"".join(ud)}</ul><p><a href="{rod}kwh-pris/#hele-regningen">Beregn hele elregningen med dit postnummer</a>, eller se <a href="{rod}nettarif/">nettariffen hos alle netselskaber</a>.</p>')
 
+MD_NAVN = ["januar", "februar", "marts", "april", "maj", "juni", "juli", "august", "september", "oktober", "november", "december"]
+def alt_time(d, net, t):
+    """Pris pr. kWh i alt (øre inkl. moms) i time t ud fra 30 dages spotprofil, uden elselskabets tillæg"""
+    n = d["net"][net]; st = d["stat"]; sp = d["profil30"][n["omraade"]][t]
+    return (sp + n["tarif"][t] + st["system"] + st["transmission"] + st["elafgift"]) * MOMS
+def blok_kwh(d, net, rod, kwh=4000):
+    f, _, _ = faelles(d, net, kwh); p = min(selskab_pris(x, kwh)[0] for x in selskaber())
+    return dk((f + p) / kwh, 2)
+def blok_profil(d):
+    v = [alt_time(d, "n1", t) for t in range(24)]; o = [alt_time(d, "radius", t) for t in range(24)]
+    lo, hi = min(v), max(v); rk = []
+    for t in range(24):
+        kl = "vinder" if v[t] <= lo + (hi - lo) * .2 else ""
+        m = ("gron", "Billig") if v[t] <= lo + (hi - lo) * .33 else (("rod", "Dyr") if v[t] >= lo + (hi - lo) * .72 else ("", "Middel"))
+        rk.append(f'<tr class="{kl}"><th scope="row" data-label="Time">kl. {t:02d}–{(t + 1) % 24:02d}</th><td class="tal" data-label="Vestdanmark i alt"><b>{dk(v[t] / 100, 2)} kr.</b></td><td class="tal" data-label="Østdanmark i alt"><b>{dk(o[t] / 100, 2)} kr.</b></td>'
+                  f'<td class="tal" data-label="Heraf spotpris (vest)">{dk(d["profil30"]["DK1"][t] * MOMS, 1)} øre</td><td class="tal" data-label="Heraf nettarif N1">{dk(d["net"]["n1"]["tarif"][t] * MOMS, 1)} øre</td><td data-label="Niveau"><span class="maerke {m[0]}">{m[1]}</span></td></tr>')
+    return (f'<div class="tabel-rul"><table class="stak"><caption>Pris pr. kWh i alt time for time, gennemsnit {dato_txt(d["spot30"]["fra"])} til {dato_txt(d["spot30"]["til"])}. Inkl. nettarif (N1 og Radius), afgifter og moms, uden elselskabets tillæg.</caption>'
+            f'<thead><tr><th>Time</th><th class="tal">Vestdanmark i alt</th><th class="tal">Østdanmark i alt</th><th class="tal">Heraf spotpris (vest)</th><th class="tal">Heraf nettarif N1</th><th>Niveau</th></tr></thead><tbody>{"".join(rk)}</tbody></table></div>')
+def profil_tal(d):
+    v = [alt_time(d, "n1", t) for t in range(24)]; o = [alt_time(d, "radius", t) for t in range(24)]
+    bi = v.index(min(v)); dy = v.index(max(v))
+    nat = sum(v[0:6]) / 6; aften = sum(v[17:21]) / 4
+    return {"billig": f"kl. {bi:02d}–{(bi + 1) % 24:02d}", "dyr": f"kl. {dy:02d}–{(dy + 1) % 24:02d}", "billig-kr": dk(min(v) / 100, 2), "dyr-kr": dk(max(v) / 100, 2),
+            "nat": dk(nat / 100, 2), "aften": dk(aften / 100, 2), "forskel": dk((aften - nat) / 100, 2), "billig-ost": dk(min(o) / 100, 2), "dyr-ost": dk(max(o) / 100, 2),
+            "vask": dk((aften - nat) * 1.5 / 100, 2), "elbil": dk(round((aften - nat) * 40 / 100)), "elbil-aar": dk(round((aften - nat) * 2500 / 100, -1))}
+def blok_hist(d):
+    rk = []
+    for k in sorted(d.get("maaneder", {}), reverse=True):
+        m = d["maaneder"][k]
+        if "DK1" not in m or "DK2" not in m: continue
+        igang = k == d["opdateret"][:7]
+        rk.append(f'<tr><th scope="row" data-label="Måned">{MD_NAVN[int(k[5:]) - 1].capitalize()} {k[:4]}{" (til og med i går)" if igang else ""}</th><td class="tal" data-label="Vestdanmark (DK1)"><b>{dk(m["DK1"]["snit"] * MOMS, 1)} øre</b></td><td class="tal" data-label="Østdanmark (DK2)"><b>{dk(m["DK2"]["snit"] * MOMS, 1)} øre</b></td><td class="tal" data-label="Timer med negativ pris (vest)">{m["DK1"]["neg_timer"]}</td></tr>')
+    return "".join(rk)
+def skriv_hist_csv(d):
+    f = os.path.join(ROD, "elpriser", "historik", "elpriser-historik.csv")
+    if not os.path.exists(f): return
+    gl = [l for l in open(f, encoding="utf-8").read().splitlines() if l and l[:7] < HIST_FRA[:7] and l[:4].isdigit()]
+    ny = [f'{k};{dk(m["DK1"]["snit"] * MOMS, 1)};{dk(m["DK2"]["snit"] * MOMS, 1)};{m["DK1"]["neg_timer"]};{m["DK2"]["neg_timer"]}' for k, m in sorted(d.get("maaneder", {}).items()) if "DK1" in m and "DK2" in m]
+    open(f, "w", encoding="utf-8").write("maaned;dk1_oere_kwh_inkl_moms;dk2_oere_kwh_inkl_moms;dk1_timer_negativ_pris;dk2_timer_negativ_pris\n" + "\n".join(gl + ny) + "\n")
+
 def skriv_csv(d):
     b = io.StringIO(); w = csv.writer(b)
     w.writerow(["netselskab", "prisomraade", "lavlast_oere_kwh_inkl_moms", "hoejlast_oere_kwh_inkl_moms", "spidslast_oere_kwh_inkl_moms", "gennemsnit_oere_kwh_inkl_moms", "abonnement_kr_md_inkl_moms", "netbetaling_kr_md_ved_4000_kwh_aar", "gyldig_fra", "hentet"])
@@ -248,10 +299,20 @@ def byg(d):
         h = saet(h, "billigste", blok_billigste(d, rod))
         h = saet(h, "dato", dato_txt(d["opdateret"]))
         h = saet(h, "antal", str(len(d["net"])))
+        if "profil30" in d and "n1" in d["net"] and "radius" in d["net"]:
+            if "<!--NET:profil-->" in h: h = saet(h, "profil", blok_profil(d))
+            if "<!--NET:pt-" in h:
+                for k, v in profil_tal(d).items(): h = saet(h, "pt-" + k, v)
+            if "<!--NET:hist-->" in h: h = saet(h, "hist", blok_hist(d))
+            for net in ("n1", "radius"):
+                if f"<!--NET:kwh-{net}-->" in h: h = saet(h, f"kwh-{net}", blok_kwh(d, net, rod))
+            h = saet(h, "md-navn", MD_NAVN[int(d["opdateret"][5:7]) - 1] + " " + d["opdateret"][:4])
         h = saet(h, "spot-dk1", dk(d["spot30"]["DK1"] * MOMS, 1)); h = saet(h, "spot-dk2", dk(d["spot30"]["DK2"] * MOMS, 1))
         h = saet(h, "stat", dk((d["stat"]["system"] + d["stat"]["transmission"]) * MOMS, 1)); h = saet(h, "afgift", dk(d["stat"]["elafgift"] * MOMS, 1))
         if h != o: open(fil, "w", encoding="utf-8").write(h); n += 1
     skriv_csv(d)
+    try: skriv_hist_csv(d)
+    except Exception as ex: print('::warning title=Historik-CSV::', ex)
     return n
 
 def main():
