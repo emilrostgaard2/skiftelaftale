@@ -1327,3 +1327,13 @@ a{color:var(--v2-dyb)}
 .hero .q1-eyb,.hero .q1-eyb *{color:var(--blaek)}
 @media(max-width:900px){.logo{font-size:1.02rem;gap:7px}.logo svg.logo-m{width:30px;height:30px}}
 .fod *{color:#dcebe4}.fod a{color:#fff}.fod hr,.fod .fod-bund{border-color:#2c5a4a}
+/* ===== v23 ===== */
+.hero .q1-tekst .q1-eyb,.hero .q1-tekst .q1-eyb *,.hero p.q1-eyb,.hero p.q1-eyb *{color:#1c2333!important}
+.fod-gitter ul{margin:0}.fod-gitter li{margin:0}
+.blog-liste{list-style:none;padding:0}.blog-liste li{border:1px solid var(--v2-kant);border-radius:10px;padding:16px 18px;margin:0 0 12px;box-shadow:0 4px 14px rgba(28,35,51,.06)}.blog-liste li a b{font-family:var(--display);font-size:1.1rem}
+.blog-kort{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:18px 0}.blog-kort a{background:#fff;border:1px solid var(--v2-kant);border-radius:10px;padding:18px;text-decoration:none;color:var(--blaek);box-shadow:0 4px 14px rgba(28,35,51,.08);display:block}
+.blog-kort a b{display:block;font-family:var(--display);font-size:1.05rem;line-height:1.3;margin-bottom:8px}.blog-kort a span{color:var(--graa);font-size:.95rem}.blog-kort a:hover{border-color:var(--v2)}
+.to-kol{columns:2;column-gap:40px}
+@media(max-width:800px){.blog-kort{grid-template-columns:1fr}.to-kol{columns:1}}
+.menu a{white-space:nowrap}
+@media(min-width:901px) and (max-width:1180px){.menu{gap:2px}.menu a{font-size:.8rem;padding-left:7px;padding-right:7px}.menu a.knap{padding:8px 12px}.logo{font-size:1.05rem}}

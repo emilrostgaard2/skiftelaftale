@@ -84,3 +84,10 @@
 Tal må citeres med kildeangivelsen "Kilde: SkiftElaftale.dk" og link. Kontakt: kontakt@skiftelaftale.dk.
 - [Nettarif 2026 hos alle netselskaber](https://skiftelaftale.dk/nettarif/): nettarif og abonnement pr. netselskab, opdateret dagligt fra Energinets DataHub. Data som CSV: https://skiftelaftale.dk/nettarif/nettariffer.csv
 - [kWh-pris i alt](https://skiftelaftale.dk/kwh-pris/): hele elregningen (spotpris, nettarif, afgifter, moms og elselskabets tillæg) efter postnummer
+
+## Blog
+- [Julebelysning: hvad koster lyskæden i strøm?](https://skiftelaftale.dk/blog/julebelysning-stroemforbrug/): En LED-lyskæde på 7 watt koster ca. 5,29 kr. for hele julen, hvis den er tændt 7 timer om dagen. Se regnestykket for LED, glødepærer og tænd/sluk-ur.
+- [Airfryer eller ovn: hvad er billigst i strøm?](https://skiftelaftale.dk/blog/airfryer-eller-ovn-stroemforbrug/): I en test brugte airfryeren 0,64 kWh på en kylling og ovnen 0,79 kWh. Forskellen er ca. 0,41 kr. pr. gang. Se tallene for mikroovn, pande og slowcooker.
+- [Hvad koster en vask og en tørring i strøm?](https://skiftelaftale.dk/blog/hvad-koster-en-vask-og-toerring/): En vask koster 1,24–2,75 kr. i strøm, og en tur i tørretumbleren 2,70–8,64 kr. Se prisen efter energimærke, og hvad du sparer ved at vaske om natten.
+- [Standby-forbrug: så meget koster det, når apparaterne ikke er slukket](https://skiftelaftale.dk/blog/standby-forbrug/): Et nyt apparat på standby koster ca. 12 kr. om året. Ældre apparater kan tilsammen bruge op til 175 kWh, ca. 473 kr. om året. Se, hvor du skal slukke.
+- [Elradiator: hvad koster den i strøm?](https://skiftelaftale.dk/blog/elradiator-stroemforbrug/): En elradiator på 1.000 watt koster 2,70 kr. i timen, når den varmer. Se prisen pr. dag og måned for 500, 1.000 og 2.000 watt, og hvad en varmepumpe sparer.
