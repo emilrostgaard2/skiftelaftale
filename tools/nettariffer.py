@@ -96,7 +96,18 @@ def nyeste(recs): return max(recs, key=lambda r: r["ValidFrom"]) if recs else No
 def hent_alt():
     nu = datetime.now(TZ); nu_s = nu.strftime("%Y-%m-%dT%H:%M:%S")
     start = (nu - timedelta(days=900)).strftime("%Y-%m-%dT00:00")
-    d03 = gaeldende(hent("DatahubPricelist", start=start, limit=0, filter=json.dumps({"ChargeType": ["D03"]})), nu_s)
+    d03_alle = hent("DatahubPricelist", start=start, limit=0, filter=json.dumps({"ChargeType": ["D03"]}))
+    d03 = gaeldende(d03_alle, nu_s)
+    # nogle netselskaber har én sats på hverdage og en anden i weekenden (korte gyldighedsperioder).
+    # Derfor regnes tariffen som gennemsnit af de næste 7 dage, ikke kun i dag.
+    uge = [(nu + timedelta(days=i)).strftime("%Y-%m-%dT12:00:00") for i in range(7)]
+    def uge_pris(ejere, kode, ejer=None):
+        dage = []
+        for tid in uge:
+            r = nyeste([x for x in d03_alle if x.get("ChargeOwner") in ejere and x["ChargeTypeCode"] == kode and (ejer is None or x.get("ChargeOwner") == ejer)
+                        and x["ValidFrom"] <= tid and (not x.get("ValidTo") or x["ValidTo"] > tid)])
+            if r: dage.append(priser(r))
+        return [sum(d[i] for d in dage) / len(dage) for i in range(24)] if dage else None
     d01 = gaeldende(hent("DatahubPricelist", start=start, limit=0, filter=json.dumps({"ChargeType": ["D01"]})), nu_s)
     ud = {"opdateret": nu.date().isoformat(), "kilde": "Energi Data Service (Energinet), datasæt DatahubPricelist og DayAheadPrices", "enhed": "øre pr. kWh og kr. pr. måned, uden moms", "moms": MOMS, "net": {}}
     stat = {}
@@ -114,11 +125,12 @@ def hent_alt():
         if not t:  # reserve: selskabets egen "Nettarif C" på timebasis
             t = nyeste([x for x in mine if re.match(r"^\s*Nettarif C( time)?\s*$", x.get("Note") or "", flags=re.I)])
         if not t: continue
-        p = priser(t)
+        p = uge_pris(ejere, t["ChargeTypeCode"], t.get("ChargeOwner")) or priser(t)
         for k in rabat:
-            rr = nyeste([x for x in mine if x["ChargeTypeCode"] == k and x.get("ChargeOwner") == t.get("ChargeOwner")])
-            if rr: p = [a + b for a, b in zip(p, priser(rr))]
+            rp = uge_pris(ejere, k, t.get("ChargeOwner"))
+            if rp: p = [a + b for a, b in zip(p, rp)]
         p = [round(max(v, 0) * 100, 3) for v in p]
+        if sum(p) <= 0: continue   # ingen reel tarif indberettet på koden: vis ikke selskabet som "gratis"
         a = None
         mine_abo = [x for x in d01 if x.get("ChargeOwner") in ejere]
         for k in abo:
