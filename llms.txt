@@ -1,14 +1,11 @@
 # SkiftElaftale.dk
 
-> Dansk sammenligning af 22 elselskaber. Vi rangerer efter, hvad en husstand betaler til selve elselskabet om året. Selskaber, vi samarbejder med (markeret som reklamelinks), vises først i listerne; begge grupper er sorteret efter pris. Faktuelle udsagn om "billigst" gælder hele markedet (tillæg × årsforbrug + 12 × abonnement + faste gebyrer ved billigste betalingsmåde, inkl. moms; normalpris uden introtilbud). Alle private elaftaler pr. selskab er med. Priser sidst kontrolleret 20. november 2026. Drives af Emro Media, CVR 46727533. Redaktør: Emil Rostgaard Clausen.
+> Dansk sammenligning af 21 elselskaber. Vi rangerer efter, hvad en husstand betaler til selve elselskabet om året. Selskaber, vi samarbejder med (markeret som reklamelinks), vises først i listerne; begge grupper er sorteret efter pris. Faktuelle udsagn om "billigst" gælder hele markedet (tillæg × årsforbrug + 12 × abonnement + faste gebyrer ved billigste betalingsmåde, inkl. moms; normalpris uden introtilbud). Alle private elaftaler pr. selskab er med. Priser sidst kontrolleret 20. november 2026. Drives af Emro Media, CVR 46727533. Redaktør: Emil Rostgaard Clausen.
 
 ## Nøgletal (20. november 2026)
 
-- Billigst ved 2.000 kWh/år: Nordisk Energi (Spot) 100 kr.; Gasel (El til børspris) 169 kr.; Altid Energi (Strøm til indkøbspris) 216 kr.
-- Billigst ved 4.000 kWh/år: Nordisk Energi (Spot) 200 kr.; Altid Energi (Strøm til indkøbspris) 216 kr.; Enkel Energi (enkel kvartal) 216 kr.
-- Billigst ved 8.000 kWh/år: Enkel Energi (enkel kvartal) 216 kr.; Nordisk Energi (Spot) 400 kr.; Altid Energi (Strøm til indkøbspris) 456 kr.
-- Forskel på billigste og dyreste aftale ved 4.000 kWh: 1.308 kr. om året
-- Gennemsnitligt tillæg: 7,1 øre/kWh. Gennemsnitligt abonnement: 26,91 kr./md.
+- Forskel på billigste og dyreste aftale ved 4.000 kWh: 1.292 kr. om året
+- Gennemsnitligt tillæg: 7,2 øre/kWh. Gennemsnitligt abonnement: 28,19 kr./md.
 - Elafgift 2026 og 2027: 0,8 øre/kWh ekskl. moms (1 øre inkl. moms).
 - Mest tilfredse elkunder (EPSI 2025): OK, for tredje år i træk.
 
@@ -16,7 +13,7 @@
 
 - [Billigste elselskab (november 2026)](https://skiftelaftale.dk/billigste-elselskab/): fuld prisliste ved 2.000, 4.000 og 8.000 kWh
 - [Bedste elselskab](https://skiftelaftale.dk/bedste-elselskab/): samlet score for pris, tilfredshed og vilkår
-- [Elselskaber i Danmark](https://skiftelaftale.dk/elselskaber/): oversigt og anmeldelser af alle 22 selskaber
+- [Elselskaber i Danmark](https://skiftelaftale.dk/elselskaber/): oversigt og anmeldelser af alle 21 selskaber
 - [Elpriser i dag](https://skiftelaftale.dk/elpriser/) og [i morgen](https://skiftelaftale.dk/elpriser/i-morgen/): spotpris time for time fra Energi Data Service
 - [Prisindeks](https://skiftelaftale.dk/prisindeks/): månedlig tidsserie, CSV, CC BY 4.0
 - [Skift elselskab](https://skiftelaftale.dk/skift-elselskab/): guide i 5 trin
@@ -36,7 +33,6 @@
 
 ## Anmeldelser
 
-- [Nordisk Energi](https://skiftelaftale.dk/elselskaber/nordisk-energi/): 200 kr. om året ved 4.000 kWh, score 8,1/10
 - [Altid Energi](https://skiftelaftale.dk/elselskaber/altid-energi/): 216 kr. om året ved 4.000 kWh, score 7,9/10
 - [Enkel Energi](https://skiftelaftale.dk/elselskaber/enkel-energi/): 216 kr. om året ved 4.000 kWh, score 7,8/10
 - [Gasel](https://skiftelaftale.dk/elselskaber/gasel/): 289 kr. om året ved 4.000 kWh, score 8,1/10

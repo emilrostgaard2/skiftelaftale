@@ -75,6 +75,17 @@ def main():
         T2 = timer(j.get("records", []), "DK2")
     except Exception as ex:
         print("::warning title=Elpriser ikke hentet::snapshot kunne ikke hente priser fra Energi Data Service:", ex); return 0
+    # reservekopi til browseren (bruges kun, hvis Energi Data Service ikke svarer hos den besøgende)
+    try:
+        kopi = {"kilde": "Energi Data Service (Energinet)", "hentet": f"{idag.day}.{idag.month}.{idag.year} kl. {pad(nu.hour)}.{pad(nu.minute)}", "DK1": [], "DK2": []}
+        for x in j.get("records", []):
+            t = x.get("TimeDK") or x.get("HourDK"); p = x.get("DayAheadPriceDKK", x.get("SpotPriceDKK")); o = x.get("PriceArea")
+            if t is None or p is None or o not in ("DK1", "DK2"): continue
+            kopi[o].append([t, round(p / 1000, 5)])
+        if len(kopi["DK1"]) >= 20 and len(kopi["DK2"]) >= 20:
+            json.dump(kopi, open(os.path.join(ROD, "data", "spotpriser.json"), "w", encoding="utf-8"), separators=(",", ":"))
+    except Exception as ex:
+        print("::warning title=Reservekopi ikke skrevet::", ex)
     dage = {"idag": [(h, v) for (d, h), v in T.items() if d == idag.isoformat()],
             "imorgen": [(h, v) for (d, h), v in T.items() if d == imorgen.isoformat()]}
     if len(dage["idag"]) < 20:

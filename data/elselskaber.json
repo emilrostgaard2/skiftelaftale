@@ -559,62 +559,6 @@
    "score": 3.1
   },
   {
-   "navn": "Nordisk Energi",
-   "slug": "nordisk-energi",
-   "url": "https://skiftelaftale.dk/elselskaber/nordisk-energi/",
-   "hjemmeside": "https://nordiskenergi.dk",
-   "binding_mdr": 0,
-   "betaling": "Bagud",
-   "gebyr_kr_aar": 0,
-   "aftaler": [
-    {
-     "navn": "Spot",
-     "tillaeg_oere": 5.0,
-     "abo_kr_md": 0,
-     "trin": null,
-     "gebyr_kr_aar": 0,
-     "gebyr_oere_kwh": 0,
-     "aarspris_2000": 100,
-     "aarspris_4000": 200,
-     "aarspris_8000": 400
-    },
-    {
-     "navn": "Flex",
-     "tillaeg_oere": 0.8,
-     "abo_kr_md": 29,
-     "trin": null,
-     "gebyr_kr_aar": 0,
-     "gebyr_oere_kwh": 0,
-     "aarspris_2000": 364,
-     "aarspris_4000": 380,
-     "aarspris_8000": 412
-    },
-    {
-     "navn": "Spot+ (grøn)",
-     "tillaeg_oere": 30.0,
-     "abo_kr_md": 0,
-     "trin": null,
-     "gebyr_kr_aar": 0,
-     "gebyr_oere_kwh": 0,
-     "aarspris_2000": 600,
-     "aarspris_4000": 1200,
-     "aarspris_8000": 2400
-    },
-    {
-     "navn": "Flex+ (grøn)",
-     "tillaeg_oere": 25.8,
-     "abo_kr_md": 29,
-     "trin": null,
-     "gebyr_kr_aar": 0,
-     "gebyr_oere_kwh": 0,
-     "aarspris_2000": 864,
-     "aarspris_4000": 1380,
-     "aarspris_8000": 2412
-    }
-   ],
-   "score": 8.1
-  },
-  {
    "navn": "SEF Energi",
    "slug": "sef-energi",
    "url": "https://skiftelaftale.dk/elselskaber/sef-energi/",

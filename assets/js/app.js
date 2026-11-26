@@ -275,15 +275,17 @@
         return { kilde: 'Energi Data Service (Energinet)', raekker: rk };
       });
     }
-    // Reservekilde, hvis Energinet ikke svarer. Priser i DKK/kWh ekskl. moms.
+    // Reservekilde, hvis Energinet ikke svarer: vores egen daglige kopi af de samme tal fra Energi Data Service.
+    // Filen skrives af tools/snapshot.py ved hver udgivelse. Priser i DKK/kWh ekskl. moms.
     function hentReserve(omraade) {
-      var d = new Date(), im = new Date(d.getTime() + 864e5);
-      var u = function (x) { return 'https://www.elprisenligenu.dk/api/v1/prices/' + x.getFullYear() + '/' + pad(x.getMonth() + 1) + '-' + pad(x.getDate()) + '_' + omraade + '.json'; };
-      var tilRk = function (j) { return j.map(function (x) { return { t: new Date(x.time_start), kr: x.DKK_per_kWh }; }); };
-      return hentJson(u(d)).then(function (j) {
-        var rk = tilRk(j); if (!rk.length) throw new Error('Tomt svar');
-        return hentJson(u(im)).then(function (j2) { return rk.concat(tilRk(j2)); }).catch(function () { return rk; });
-      }).then(function (rk) { return { kilde: 'Elprisen lige nu.dk (reservekilde)', raekker: rk }; });
+      var d = new Date();
+      return hentJson('/data/spotpriser.json?d=' + dagStr(d) + '-' + pad(d.getHours())).then(function (j) {
+        var idag = dagStr(d);
+        var rk = ((j && j[omraade]) || []).map(function (x) { return { t: new Date(x[0]), kr: x[1] }; })
+          .filter(function (x) { return !isNaN(x.t) && isFinite(x.kr) && dagStr(x.t) >= idag; });
+        if (!rk.some(function (x) { return dagStr(x.t) === idag; })) throw new Error('Ingen priser for i dag i kopien');
+        return { kilde: 'Energi Data Service (Energinet), vores kopi fra ' + (j.hentet || 'i dag'), raekker: rk };
+      });
     }
     // Lokal kopi af seneste svar, så siden aldrig står tom, hvis begge kilder driller
     function gem(o, res) { try { localStorage.setItem('elpris-' + o, JSON.stringify({ d: dagStr(new Date()), k: res.kilde, r: res.raekker.map(function (x) { return [x.t.getTime(), x.kr]; }) })); } catch (e) {} }
